@@ -4,11 +4,12 @@ import { useState } from 'react'
 import { ClientTable } from '@/components/clients/client-table'
 import { ClientModal } from '@/components/clients/client-modal'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
-import { mockClients } from '@/data/mockData'
+import { useClients } from '@/contexts/clients-context'
 import { Client } from '@/types'
+import { toast } from 'sonner'
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>(mockClients)
+  const { clients, loading, createClient, updateClient, deleteClient } = useClients()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -24,42 +25,54 @@ export default function ClientsPage() {
     setIsDeleteModalOpen(true)
   }
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (clientToDelete) {
-      setClients(clients.filter(c => c.id !== clientToDelete.id))
-      setIsDeleteModalOpen(false)
-      setClientToDelete(null)
+      const success = await deleteClient(clientToDelete.id)
+      if (success) {
+        toast.success('Cliente eliminado exitosamente')
+        setIsDeleteModalOpen(false)
+        setClientToDelete(null)
+      } else {
+        toast.error('Error eliminando cliente')
+      }
     }
   }
 
-  const handleView = (client: Client) => {
-    console.log('View client:', client)
-    // TODO: Implement view modal
-  }
 
   const handleCreate = () => {
     setSelectedClient(null)
     setIsModalOpen(true)
   }
 
-  const handleSaveClient = (clientData: Omit<Client, 'id'>) => {
+  const handleSaveClient = async (clientData: Omit<Client, 'id'>) => {
     if (selectedClient) {
       // Edit existing client
-      setClients(prev => 
-        prev.map(client => 
-          client.id === selectedClient.id 
-            ? { ...clientData, id: selectedClient.id }
-            : client
-        )
-      )
+      const success = await updateClient(selectedClient.id, clientData)
+      if (success) {
+        toast.success('Cliente actualizado exitosamente')
+        setIsModalOpen(false)
+        setSelectedClient(null)
+      } else {
+        toast.error('Error actualizando cliente')
+      }
     } else {
       // Create new client
-      const newClient: Client = {
-        ...clientData,
-        id: (clients.length + 1).toString()
+      const success = await createClient(clientData)
+      if (success) {
+        toast.success('Cliente creado exitosamente')
+        setIsModalOpen(false)
+      } else {
+        toast.error('Error creando cliente')
       }
-      setClients(prev => [newClient, ...prev])
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+      </div>
+    )
   }
 
   return (
@@ -75,7 +88,6 @@ export default function ClientsPage() {
         clients={clients}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onView={handleView}
         onCreate={handleCreate}
       />
 

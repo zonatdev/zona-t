@@ -3,6 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/auth-context";
+import { ClientsProvider } from "@/contexts/clients-context";
+import { ProductsProvider } from "@/contexts/products-context";
+import { CategoriesProvider } from "@/contexts/categories-context";
+import { SalesProvider } from "@/contexts/sales-context";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import { Toaster } from "sonner";
@@ -39,10 +43,18 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthProvider>
-            <ConditionalLayout>
-              {children}
-            </ConditionalLayout>
-            <Toaster />
+            <ClientsProvider>
+              <ProductsProvider>
+                <CategoriesProvider>
+                  <SalesProvider>
+                    <ConditionalLayout>
+                      {children}
+                    </ConditionalLayout>
+                    <Toaster />
+                  </SalesProvider>
+                </CategoriesProvider>
+              </ProductsProvider>
+            </ClientsProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

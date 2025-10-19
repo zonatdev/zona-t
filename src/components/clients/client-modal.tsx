@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -37,16 +37,46 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // Actualizar formulario cuando cambie el cliente
+  useEffect(() => {
+    if (client) {
+      setFormData({
+        name: client.name || '',
+        email: client.email || '',
+        phone: client.phone || '',
+        document: client.document || '',
+        address: client.address || '',
+        city: client.city || '',
+        state: client.state || '',
+        type: client.type || 'consumidor_final',
+        status: client.status || 'active'
+      })
+    } else {
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        document: '',
+        address: '',
+        city: '',
+        state: '',
+        type: 'consumidor_final',
+        status: 'active'
+      })
+    }
+    setErrors({})
+  }, [client])
+
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'mayorista':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-900/20 text-blue-400 border-blue-700'
       case 'minorista':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-purple-900/20 text-purple-400 border-purple-700'
       case 'consumidor_final':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-900/20 text-green-400 border-green-700'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-700 text-gray-300 border-gray-600'
     }
   }
 
@@ -164,17 +194,17 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
   const isEdit = !!client
 
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center space-x-3">
-            <Users className="h-6 w-6 text-emerald-600" />
+            <Users className="h-6 w-6 text-emerald-400" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-white">
                 {isEdit ? 'Editar Cliente' : 'Nuevo Cliente'}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-300">
                 {isEdit ? 'Modifica la información del cliente' : 'Agrega un nuevo cliente al sistema'}
               </p>
             </div>
@@ -183,43 +213,43 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
             onClick={handleClose}
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 hover:bg-gray-100"
+            className="h-8 w-8 p-0 hover:bg-gray-700"
           >
-            <X className="h-5 w-5 text-gray-600 hover:text-gray-900" />
+            <X className="h-5 w-5 text-gray-300 hover:text-white" />
           </Button>
         </div>
 
         <div className="p-6 overflow-y-auto flex-1">
           <div className="space-y-6">
             {/* Información Básica */}
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-lg text-gray-900 flex items-center">
-                  <User className="h-5 w-5 mr-2 text-emerald-600" />
+                <CardTitle className="text-lg text-white flex items-center">
+                  <User className="h-5 w-5 mr-2 text-emerald-400" />
                   Información Básica
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Nombre del Cliente *
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 ${
-                      errors.name ? 'border-red-300' : 'border-gray-300'
+                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                      errors.name ? 'border-red-400' : 'border-gray-600'
                     }`}
                     placeholder="Ingresa el nombre del cliente"
                   />
                   {errors.name && (
-                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                    <p className="mt-1 text-sm text-red-400">{errors.name}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Tipo de Cliente *
                   </label>
                   <div className="flex space-x-3">
@@ -235,12 +265,12 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
                                   onClick={() => handleInputChange('type', type.value)}
                                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all ${
                                     formData.type === type.value
-                                      ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
-                                      : 'border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900'
+                                      ? 'border-emerald-500 bg-emerald-600 text-white'
+                                      : 'border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600'
                                   }`}
                                 >
                                   <Icon className={`h-4 w-4 ${
-                                    formData.type === type.value ? 'text-emerald-600' : 'text-gray-600'
+                                    formData.type === type.value ? 'text-white' : 'text-gray-400'
                                   }`} />
                                   <span className="text-sm font-medium">{type.label}</span>
                                 </button>
@@ -258,131 +288,131 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
             </Card>
 
             {/* Información de Contacto */}
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-lg text-gray-900 flex items-center">
-                  <Mail className="h-5 w-5 mr-2 text-emerald-600" />
+                <CardTitle className="text-lg text-white flex items-center">
+                  <Mail className="h-5 w-5 mr-2 text-emerald-400" />
                   Información de Contacto
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Cédula/NIT *
                   </label>
                   <input
                     type="text"
                     value={formData.document}
                     onChange={(e) => handleInputChange('document', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 ${
-                      errors.document ? 'border-red-300' : 'border-gray-300'
+                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                      errors.document ? 'border-red-400' : 'border-gray-600'
                     }`}
                     placeholder="12345678-9 o 900123456-7"
                   />
                   {errors.document && (
-                    <p className="mt-1 text-sm text-red-600">{errors.document}</p>
+                    <p className="mt-1 text-sm text-red-400">{errors.document}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Teléfono *
                   </label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 ${
-                      errors.phone ? 'border-red-300' : 'border-gray-300'
+                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                      errors.phone ? 'border-red-400' : 'border-gray-600'
                     }`}
                     placeholder="+52 55 1234 5678"
                   />
                   {errors.phone && (
-                    <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+                    <p className="mt-1 text-sm text-red-400">{errors.phone}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Email *
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 ${
-                      errors.email ? 'border-red-300' : 'border-gray-300'
+                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                      errors.email ? 'border-red-400' : 'border-gray-600'
                     }`}
                     placeholder="cliente@ejemplo.com"
                   />
                   {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                    <p className="mt-1 text-sm text-red-400">{errors.email}</p>
                   )}
                 </div>
               </CardContent>
             </Card>
 
             {/* Información de Ubicación */}
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-lg text-gray-900 flex items-center">
-                  <MapPin className="h-5 w-5 mr-2 text-emerald-600" />
+                <CardTitle className="text-lg text-white flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-emerald-400" />
                   Información de Ubicación
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Dirección *
                   </label>
                   <input
                     type="text"
                     value={formData.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 ${
-                      errors.address ? 'border-red-300' : 'border-gray-300'
+                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                      errors.address ? 'border-red-400' : 'border-gray-600'
                     }`}
                     placeholder="Calle 30 #25-15, Barrio La Palma"
                   />
                   {errors.address && (
-                    <p className="mt-1 text-sm text-red-600">{errors.address}</p>
+                    <p className="mt-1 text-sm text-red-400">{errors.address}</p>
                   )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Ciudad *
                     </label>
                     <input
                       type="text"
                       value={formData.city}
                       onChange={(e) => handleInputChange('city', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 ${
-                        errors.city ? 'border-red-300' : 'border-gray-300'
+                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                        errors.city ? 'border-red-400' : 'border-gray-600'
                       }`}
                       placeholder="Sincelejo"
                     />
                     {errors.city && (
-                      <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                      <p className="mt-1 text-sm text-red-400">{errors.city}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Estado *
                     </label>
                     <input
                       type="text"
                       value={formData.state}
                       onChange={(e) => handleInputChange('state', e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 ${
-                        errors.state ? 'border-red-300' : 'border-gray-300'
+                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                        errors.state ? 'border-red-400' : 'border-gray-600'
                       }`}
                       placeholder="Sucre"
                     />
                     {errors.state && (
-                      <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+                      <p className="mt-1 text-sm text-red-400">{errors.state}</p>
                     )}
                   </div>
                 </div>
@@ -390,9 +420,9 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
             </Card>
 
             {/* Estado */}
-            <Card>
+            <Card className="bg-gray-800 border-gray-700">
               <CardHeader>
-                <CardTitle className="text-lg text-gray-900">Estado del Cliente</CardTitle>
+                <CardTitle className="text-lg text-white">Estado del Cliente</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4">
@@ -403,9 +433,9 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
                       value="active"
                       checked={formData.status === 'active'}
                       onChange={(e) => handleInputChange('status', e.target.value)}
-                      className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
+                      className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-600 bg-gray-700"
                     />
-                    <span className="ml-2 text-sm font-medium text-gray-700">Activo</span>
+                    <span className="ml-2 text-sm font-medium text-gray-300">Activo</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -414,9 +444,9 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
                       value="inactive"
                       checked={formData.status === 'inactive'}
                       onChange={(e) => handleInputChange('status', e.target.value)}
-                      className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300"
+                      className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-600 bg-gray-700"
                     />
-                    <span className="ml-2 text-sm font-medium text-gray-700">Inactivo</span>
+                    <span className="ml-2 text-sm font-medium text-gray-300">Inactivo</span>
                   </label>
                 </div>
               </CardContent>
@@ -425,11 +455,11 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end space-x-4 p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-end space-x-4 p-6 border-t border-gray-700 bg-gray-800">
           <Button
             onClick={handleClose}
             variant="outline"
-            className="border-gray-400 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
           >
             Cancelar
           </Button>

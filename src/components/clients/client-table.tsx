@@ -9,7 +9,6 @@ import {
   Plus, 
   Edit, 
   Trash2, 
-  Eye,
   Users,
   Building2,
   User
@@ -20,7 +19,6 @@ interface ClientTableProps {
   clients: Client[]
   onEdit: (client: Client) => void
   onDelete: (client: Client) => void
-  onView: (client: Client) => void
   onCreate: () => void
 }
 
@@ -28,7 +26,6 @@ export function ClientTable({
   clients, 
   onEdit, 
   onDelete, 
-  onView, 
   onCreate 
 }: ClientTableProps) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -37,20 +34,20 @@ export function ClientTable({
 
   const getStatusColor = (status: string) => {
     return status === 'active' 
-      ? 'bg-green-100 text-green-800' 
-      : 'bg-red-100 text-red-800'
+      ? 'bg-green-900/20 text-green-400 border-green-700' 
+      : 'bg-red-900/20 text-red-400 border-red-700'
   }
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'mayorista':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-900/20 text-blue-400 border-blue-700'
       case 'minorista':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-purple-900/20 text-purple-400 border-purple-700'
       case 'consumidor_final':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-900/20 text-green-400 border-green-700'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-700 text-gray-300 border-gray-600'
     }
   }
 
@@ -201,16 +198,9 @@ export function ClientTable({
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => onView(client)}
-                          className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700 hover:bg-blue-100"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
                           onClick={() => onEdit(client)}
-                          className="h-8 w-8 p-0 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100"
+                          className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20 dark:text-emerald-400 dark:hover:text-emerald-300 dark:hover:bg-emerald-900/20"
+                          title="Editar cliente"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -218,7 +208,8 @@ export function ClientTable({
                           size="sm"
                           variant="ghost"
                           onClick={() => onDelete(client)}
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                          className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                          title="Eliminar cliente"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

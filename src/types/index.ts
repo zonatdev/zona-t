@@ -106,6 +106,7 @@ export interface Sale {
   discount: number
   status: 'pending' | 'completed' | 'cancelled'
   paymentMethod: 'cash' | 'credit' | 'transfer' | 'warranty' | 'mixed'
+  invoiceNumber?: string
   createdAt: string
   items: SaleItem[]
 }

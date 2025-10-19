@@ -35,6 +35,32 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // Función para formatear números con separadores de miles
+  const formatNumber = (value: number | string): string => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value
+    if (isNaN(numValue) || numValue === 0) return ''
+    
+    // Para números enteros, no mostrar decimales
+    if (Number.isInteger(numValue)) {
+      return numValue.toLocaleString('es-CO', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      })
+    }
+    // Para números con decimales, mostrar hasta 2 decimales
+    return numValue.toLocaleString('es-CO', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    })
+  }
+
+  // Función para parsear números con formato
+  const parseFormattedNumber = (value: string): number => {
+    // Remover separadores de miles y convertir a número
+    const cleanValue = value.replace(/\./g, '').replace(/,/g, '')
+    return parseFloat(cleanValue) || 0
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -345,11 +371,12 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                       <span className="text-gray-400 text-sm">$</span>
                     </div>
                     <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
+                      type="text"
+                      value={formatNumber(formData.price)}
+                      onChange={(e) => {
+                        const numericValue = parseFormattedNumber(e.target.value)
+                        handleInputChange('price', numericValue)
+                      }}
                       className={`w-full pl-8 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-800 ${
                         errors.price ? 'border-red-500 ' : 'border-gray-600 '
                       }`}
@@ -370,11 +397,12 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                       <span className="text-gray-400 text-sm">$</span>
                     </div>
                     <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.cost}
-                      onChange={(e) => handleInputChange('cost', parseFloat(e.target.value) || 0)}
+                      type="text"
+                      value={formatNumber(formData.cost)}
+                      onChange={(e) => {
+                        const numericValue = parseFormattedNumber(e.target.value)
+                        handleInputChange('cost', numericValue)
+                      }}
                       className={`w-full pl-8 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-800 ${
                         errors.cost ? 'border-red-500 ' : 'border-gray-600 '
                       }`}
@@ -395,6 +423,11 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                   <BarChart3 className="h-5 w-5 mr-2 text-emerald-400" />
                   Control de Stock
                 </CardTitle>
+                {product && (
+                  <p className="text-sm text-gray-400 mt-2">
+                    ℹ️ El stock se muestra solo como información. Para modificar el inventario, usa las opciones de "Ajustar Stock" o "Transferir Stock" desde la tabla de productos.
+                  </p>
+                )}
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Ubicación inicial para nuevos productos */}
@@ -445,16 +478,26 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                       <label className="block text-sm font-medium text-gray-300 mb-2">
                         Stock Actual
                       </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={formData.stock.warehouse}
-                        onChange={(e) => handleInputChange('stock.warehouse', parseInt(e.target.value) || 0)}
-                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-800 ${
-                          errors.stockWarehouse ? 'border-red-500' : 'border-gray-600'
-                        }`}
-                        placeholder="0"
-                      />
+                      {product ? (
+                        // Solo lectura para productos existentes
+                        <div className="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-600/50 text-gray-300 cursor-not-allowed opacity-75">
+                          {formatNumber(formData.stock.warehouse)} unidades
+                        </div>
+                      ) : (
+                        // Editable solo para nuevos productos
+                        <input
+                          type="text"
+                          value={formatNumber(formData.stock.warehouse)}
+                          onChange={(e) => {
+                            const numericValue = parseFormattedNumber(e.target.value)
+                            handleInputChange('stock.warehouse', numericValue)
+                          }}
+                          className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-800 ${
+                            errors.stockWarehouse ? 'border-red-500' : 'border-gray-600'
+                          }`}
+                          placeholder="0"
+                        />
+                      )}
                       {errors.stockWarehouse && (
                         <p className="mt-1 text-sm text-red-400">{errors.stockWarehouse}</p>
                       )}
@@ -473,16 +516,26 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                       <label className="block text-sm font-medium text-gray-300 mb-2">
                         Stock Actual
                       </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={formData.stock.store}
-                        onChange={(e) => handleInputChange('stock.store', parseInt(e.target.value) || 0)}
-                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-800 ${
-                          errors.stockStore ? 'border-red-500' : 'border-gray-600'
-                        }`}
-                        placeholder="0"
-                      />
+                      {product ? (
+                        // Solo lectura para productos existentes
+                        <div className="w-full px-3 py-2 border border-gray-500 rounded-md bg-gray-600/50 text-gray-300 cursor-not-allowed opacity-75">
+                          {formatNumber(formData.stock.store)} unidades
+                        </div>
+                      ) : (
+                        // Editable solo para nuevos productos
+                        <input
+                          type="text"
+                          value={formatNumber(formData.stock.store)}
+                          onChange={(e) => {
+                            const numericValue = parseFormattedNumber(e.target.value)
+                            handleInputChange('stock.store', numericValue)
+                          }}
+                          className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-800 ${
+                            errors.stockStore ? 'border-red-500' : 'border-gray-600'
+                          }`}
+                          placeholder="0"
+                        />
+                      )}
                       {errors.stockStore && (
                         <p className="mt-1 text-sm text-red-400">{errors.stockStore}</p>
                       )}
@@ -496,7 +549,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-300">Stock Total:</span>
                     <span className="text-lg font-bold text-emerald-400">
-                      {formData.stock.warehouse + formData.stock.store} unidades
+                      {formatNumber(formData.stock.warehouse + formData.stock.store)} unidades
                     </span>
                   </div>
                 </div>

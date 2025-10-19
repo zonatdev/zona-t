@@ -5,13 +5,16 @@ import { ProductTable } from '@/components/products/product-table'
 import { ProductModal } from '@/components/products/product-modal'
 import { CategoryModal } from '@/components/categories/category-modal'
 import { StockTransferModal } from '@/components/products/stock-transfer-modal'
+import { StockAdjustmentModal } from '@/components/products/stock-adjustment-modal'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
-import { mockProducts, mockCategories } from '@/data/mockProducts'
+import { useProducts } from '@/contexts/products-context'
+import { useCategories } from '@/contexts/categories-context'
 import { Product, Category, StockTransfer } from '@/types'
+import { toast } from 'sonner'
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>(mockProducts)
-  const [categories, setCategories] = useState<Category[]>(mockCategories)
+  const { products, loading, createProduct, updateProduct, deleteProduct, transferStock, adjustStock } = useProducts()
+  const { categories, createCategory, toggleCategoryStatus, deleteCategory } = useCategories()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -20,6 +23,8 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [productToTransfer, setProductToTransfer] = useState<Product | null>(null)
+  const [isAdjustmentModalOpen, setIsAdjustmentModalOpen] = useState(false)
+  const [productToAdjust, setProductToAdjust] = useState<Product | null>(null)
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product)
@@ -31,18 +36,35 @@ export default function ProductsPage() {
     setIsDeleteModalOpen(true)
   }
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (productToDelete) {
-      setProducts(products.filter(p => p.id !== productToDelete.id))
-      setIsDeleteModalOpen(false)
-      setProductToDelete(null)
+      const success = await deleteProduct(productToDelete.id)
+      if (success) {
+        toast.success('Producto eliminado exitosamente')
+        setIsDeleteModalOpen(false)
+        setProductToDelete(null)
+      } else {
+        toast.error('Error eliminando producto')
+      }
     }
   }
 
 
   const handleStockAdjustment = (product: Product) => {
-    console.log('Stock adjustment for:', product)
-    // TODO: Implement stock adjustment modal
+    setProductToAdjust(product)
+    setIsAdjustmentModalOpen(true)
+  }
+
+  const handleAdjustStock = async (productId: string, location: 'warehouse' | 'store', newQuantity: number, reason: string) => {
+    const success = await adjustStock(productId, location, newQuantity, reason)
+    
+    if (success) {
+      toast.success('Stock ajustado exitosamente')
+      setIsAdjustmentModalOpen(false)
+      setProductToAdjust(null)
+    } else {
+      toast.error('Error ajustando stock')
+    }
   }
 
   const handleStockTransfer = (product: Product) => {
@@ -50,62 +72,21 @@ export default function ProductsPage() {
     setIsTransferModalOpen(true)
   }
 
-  const handleTransferStock = (transferData: Omit<StockTransfer, 'id' | 'createdAt' | 'userId' | 'userName'>) => {
-    setProducts(prev => 
-      prev.map(product => {
-        if (product.id === transferData.productId) {
-          const stockBefore = {
-            warehouse: product.stock.warehouse,
-            store: product.stock.store,
-            total: product.stock.total
-          }
-
-          const newWarehouseStock = transferData.fromLocation === 'warehouse' 
-            ? product.stock.warehouse - transferData.quantity
-            : product.stock.warehouse + (transferData.toLocation === 'warehouse' ? transferData.quantity : 0)
-          
-          const newStoreStock = transferData.fromLocation === 'store'
-            ? product.stock.store - transferData.quantity
-            : product.stock.store + (transferData.toLocation === 'store' ? transferData.quantity : 0)
-
-          const stockAfter = {
-            warehouse: newWarehouseStock,
-            store: newStoreStock,
-            total: newWarehouseStock + newStoreStock
-          }
-
-          // Crear log de transferencia
-          const transferLog = {
-            id: Date.now().toString(),
-            type: 'transfer' as const,
-            action: 'Transferencia de Stock',
-            description: `Transferencia de ${transferData.quantity} unidades de ${transferData.productName} desde ${transferData.fromLocation === 'warehouse' ? 'Bodega' : 'Local'} hacia ${transferData.toLocation === 'warehouse' ? 'Bodega' : 'Local'}`,
-            details: {
-              productId: transferData.productId,
-              productName: transferData.productName,
-              fromLocation: transferData.fromLocation,
-              toLocation: transferData.toLocation,
-              quantity: transferData.quantity,
-              reason: transferData.reason,
-              stockBefore,
-              stockAfter
-            },
-            userId: '1',
-            userName: 'Diego Admin',
-            timestamp: new Date().toISOString()
-          }
-
-          // Aquí podrías guardar el log en una base de datos
-          console.log('Transfer log created:', transferLog)
-
-          return {
-            ...product,
-            stock: stockAfter
-          }
-        }
-        return product
-      })
+  const handleTransferStock = async (transferData: Omit<StockTransfer, 'id' | 'createdAt' | 'userId' | 'userName'>) => {
+    const success = await transferStock(
+      transferData.productId,
+      transferData.fromLocation,
+      transferData.toLocation,
+      transferData.quantity
     )
+    
+    if (success) {
+      toast.success('Stock transferido exitosamente')
+      setIsTransferModalOpen(false)
+      setProductToTransfer(null)
+    } else {
+      toast.error('Error transfiriendo stock')
+    }
   }
 
   const handleManageCategories = () => {
@@ -113,26 +94,36 @@ export default function ProductsPage() {
     setIsCategoryModalOpen(true)
   }
 
-  const handleSaveCategory = (categoryData: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newCategory: Category = {
-      ...categoryData,
-      id: (categories.length + 1).toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+  const handleSaveCategory = async (categoryData: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const success = await createCategory(categoryData)
+    if (success) {
+      toast.success('Categoría creada exitosamente')
+      // No cerrar el modal para que el usuario pueda ver la categoría creada
+      // setIsCategoryModalOpen(false)
+      // setSelectedCategory(null)
+    } else {
+      toast.error('Error creando categoría')
     }
-    setCategories(prev => [newCategory, ...prev])
   }
 
-  const handleUpdateCategory = (category: Category) => {
-    setCategories(prev =>
-      prev.map(cat =>
-        cat.id === category.id ? category : cat
-      )
-    )
+
+  const handleToggleCategoryStatus = async (categoryId: string, newStatus: 'active' | 'inactive') => {
+    const success = await toggleCategoryStatus(categoryId, newStatus)
+    if (success) {
+      const statusText = newStatus === 'active' ? 'habilitada' : 'deshabilitada'
+      toast.success(`Categoría ${statusText} exitosamente`)
+    } else {
+      toast.error('Error cambiando estado de categoría')
+    }
   }
 
-  const handleDeleteCategory = (categoryId: string) => {
-    setCategories(prev => prev.filter(cat => cat.id !== categoryId))
+  const handleDeleteCategory = async (categoryId: string) => {
+    const success = await deleteCategory(categoryId)
+    if (success) {
+      toast.success('Categoría eliminada exitosamente')
+    } else {
+      toast.error('Error eliminando categoría')
+    }
   }
 
   const handleCreate = () => {
@@ -140,24 +131,35 @@ export default function ProductsPage() {
     setIsModalOpen(true)
   }
 
-  const handleSaveProduct = (productData: Omit<Product, 'id'>) => {
+  const handleSaveProduct = async (productData: Omit<Product, 'id'>) => {
     if (selectedProduct) {
       // Edit existing product
-      setProducts(prev =>
-        prev.map(product =>
-          product.id === selectedProduct.id
-            ? { ...productData, id: selectedProduct.id }
-            : product
-        )
-      )
+      const success = await updateProduct(selectedProduct.id, productData)
+      if (success) {
+        toast.success('Producto actualizado exitosamente')
+        setIsModalOpen(false)
+        setSelectedProduct(null)
+      } else {
+        toast.error('Error actualizando producto')
+      }
     } else {
       // Create new product
-      const newProduct: Product = {
-        ...productData,
-        id: (products.length + 1).toString()
+      const success = await createProduct(productData)
+      if (success) {
+        toast.success('Producto creado exitosamente')
+        setIsModalOpen(false)
+      } else {
+        toast.error('Error creando producto')
       }
-      setProducts(prev => [newProduct, ...prev])
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+      </div>
+    )
   }
 
   return (
@@ -198,9 +200,8 @@ export default function ProductsPage() {
           setSelectedCategory(null)
         }}
         onSave={handleSaveCategory}
-        onUpdate={handleUpdateCategory}
+        onToggleStatus={handleToggleCategoryStatus}
         onDelete={handleDeleteCategory}
-        category={selectedCategory}
         categories={categories}
       />
 
@@ -212,6 +213,16 @@ export default function ProductsPage() {
                 }}
                 onTransfer={handleTransferStock}
                 product={productToTransfer}
+              />
+
+              <StockAdjustmentModal
+                isOpen={isAdjustmentModalOpen}
+                onClose={() => {
+                  setIsAdjustmentModalOpen(false)
+                  setProductToAdjust(null)
+                }}
+                onAdjust={handleAdjustStock}
+                product={productToAdjust}
               />
 
               <ConfirmModal

@@ -57,12 +57,68 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
         return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
       case 'category_create':
         return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400'
+      case 'category_update':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
       case 'category_edit':
         return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400'
       case 'category_delete':
         return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+    }
+  }
+
+  const getActionLabel = (action: string, module: string) => {
+    // Manejar acciones específicas de productos
+    if (module === 'products') {
+      switch (action) {
+      case 'product_create':
+        return 'Crear Producto'
+      case 'product_update':
+        return 'Actualizar Producto'
+      case 'product_delete':
+        return 'Eliminar Producto'
+      case 'stock_transfer':
+        return 'Transferir Stock'
+      case 'stock_adjustment':
+        return 'Ajustar Stock'
+        default:
+          return action
+      }
+    }
+    
+    // Manejar acciones específicas de categorías
+    if (module === 'categories') {
+      switch (action) {
+      case 'category_create':
+        return 'Crear Categoría'
+      case 'category_update':
+        return 'Actualizar Categoría'
+      case 'category_delete':
+        return 'Eliminar Categoría'
+        default:
+          return action
+      }
+    }
+    
+    // Manejar otras acciones
+    switch (action) {
+      case 'Usuario Creado':
+        return 'Crear Usuario'
+      case 'Usuario Editado':
+        return 'Editar Usuario'
+      case 'Usuario Eliminado':
+        return 'Eliminar Usuario'
+      case 'Permisos Asignados':
+        return 'Asignar Permisos'
+      case 'Rol Cambiado':
+        return 'Cambiar Rol'
+      case 'Usuario Desactivado':
+        return 'Desactivar Usuario'
+      case 'Usuario Reactivado':
+        return 'Reactivar Usuario'
+      default:
+        return action
     }
   }
 
@@ -86,6 +142,8 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
         return 'Cliente Eliminado'
       case 'category_create':
         return 'Categoría Creada'
+      case 'category_update':
+        return 'Categoría Actualizada'
       case 'category_edit':
         return 'Categoría Editada'
       case 'category_delete':
@@ -141,7 +199,7 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
                 <span className="text-sm text-gray-400">Acción:</span>
                 <Badge className={getTypeColor(log.type)}>
                   <TypeIcon className="h-3 w-3 mr-1" />
-                  {log.action}
+                  {getActionLabel(log.action, log.module)}
                 </Badge>
               </div>
               
@@ -286,6 +344,413 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
                             - Nuevo rol: {log.details.changes.role}
                           </span>
                         )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Información específica para productos */}
+                  {log.action === 'product_create' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Producto creado:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2 font-medium text-emerald-400 mb-3">
+                            <Package className="h-4 w-4" />
+                            <span>Resumen del Producto</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-gray-300 text-xs">Nombre:</span>
+                              <div className="text-white font-medium">{log.details.productName || 'N/A'}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Referencia:</span>
+                              <div className="text-white font-mono text-sm">{log.details.productReference || 'N/A'}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Marca:</span>
+                              <div className="text-white">{log.details.brand || 'N/A'}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Categoría ID:</span>
+                              <div className="text-white font-mono text-xs">{log.details.category || 'N/A'}</div>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Stock Inicial:</span>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="bg-gray-600 p-3 rounded-lg">
+                                <div className="text-blue-400 text-xs">Bodega</div>
+                                <div className="text-white font-bold text-lg">{log.details.stockWarehouse || 0} unidades</div>
+                              </div>
+                              <div className="bg-gray-600 p-3 rounded-lg">
+                                <div className="text-green-400 text-xs">Local</div>
+                                <div className="text-white font-bold text-lg">{log.details.stockStore || 0} unidades</div>
+                              </div>
+                            </div>
+                            <div className="mt-2 text-center">
+                              <span className="text-gray-300 text-xs">Total: </span>
+                              <span className="text-emerald-400 font-bold">
+                                {(log.details.stockWarehouse || 0) + (log.details.stockStore || 0)} unidades
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Precios:</span>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <span className="text-gray-400 text-xs">Precio de Venta:</span>
+                                <div className="text-white font-medium">${(log.details.price || 0).toLocaleString('es-CO')}</div>
+                              </div>
+                              <div>
+                                <span className="text-gray-400 text-xs">Costo:</span>
+                                <div className="text-white font-medium">${(log.details.cost || 0).toLocaleString('es-CO')}</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'product_update' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Producto actualizado:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2 font-medium text-yellow-400 mb-3">
+                            <Package className="h-4 w-4" />
+                            <span>Cambios Realizados</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-gray-300 text-xs">Producto:</span>
+                              <div className="text-white font-medium">{log.details.productName || 'ID: ' + (log.details.productId || 'N/A')}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Referencia:</span>
+                              <div className="text-white font-mono text-sm">{log.details.productReference || 'N/A'}</div>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <span className="text-gray-300 text-xs">Campos modificados:</span>
+                            <div className="text-yellow-300 text-sm">
+                              {log.details.changes ? log.details.changes.join(', ') : 'N/A'}
+                            </div>
+                          </div>
+                          
+                          {log.details.updatedFields && (
+                            <div className="border-t border-gray-600 pt-3">
+                              <span className="text-gray-300 text-xs block mb-2">Valores actualizados:</span>
+                              <div className="space-y-2">
+                                {Object.entries(log.details.updatedFields).map(([field, value]) => (
+                                  <div key={field} className="flex justify-between items-center bg-gray-600 p-2 rounded">
+                                    <span className="text-gray-300 text-xs capitalize">
+                                      {field === 'name' ? 'Nombre' :
+                                       field === 'reference' ? 'Referencia' :
+                                       field === 'brand' ? 'Marca' :
+                                       field === 'price' ? 'Precio' :
+                                       field === 'cost' ? 'Costo' :
+                                       field === 'description' ? 'Descripción' :
+                                       field === 'status' ? 'Estado' :
+                                       field === 'stock' ? 'Stock' :
+                                       field}
+                                    </span>
+                                    <span className="text-white text-xs">
+                                      {field === 'price' || field === 'cost' ? 
+                                        `$${(value as number).toLocaleString('es-CO')}` :
+                                        field === 'stock' ? 
+                                          JSON.stringify(value) :
+                                        String(value)
+                                      }
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {log.details.previousValues && (
+                            <div className="border-t border-gray-600 pt-3">
+                              <span className="text-gray-300 text-xs block mb-2">Valores anteriores:</span>
+                              <div className="grid grid-cols-2 gap-4 text-xs">
+                                <div>
+                                  <span className="text-gray-400">Nombre:</span>
+                                  <div className="text-gray-300">{log.details.previousValues.name || 'N/A'}</div>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Referencia:</span>
+                                  <div className="text-gray-300 font-mono">{log.details.previousValues.reference || 'N/A'}</div>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Marca:</span>
+                                  <div className="text-gray-300">{log.details.previousValues.brand || 'N/A'}</div>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Precio:</span>
+                                  <div className="text-gray-300">${(log.details.previousValues.price || 0).toLocaleString('es-CO')}</div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'product_delete' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Producto eliminado:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2 font-medium text-red-400 mb-3">
+                            <Package className="h-4 w-4" />
+                            <span>Producto Eliminado</span>
+                          </div>
+                          
+                          <div>
+                            <span className="text-gray-300 text-xs">ID del Producto:</span>
+                            <div className="text-white font-mono text-sm">{log.details.productId || 'N/A'}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'stock_transfer' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Transferencia de stock:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2 font-medium text-blue-400 mb-3">
+                            <ArrowRightLeft className="h-4 w-4" />
+                            <span>Transferencia de Stock</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-gray-300 text-xs">Producto:</span>
+                              <div className="text-white font-medium">{log.details.productName || 'N/A'}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Referencia:</span>
+                              <div className="text-white font-mono text-sm">{log.details.productReference || 'N/A'}</div>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Detalles de la Transferencia:</span>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="bg-gray-600 p-3 rounded-lg">
+                                <div className="text-red-400 text-xs">Desde:</div>
+                                <div className="text-white font-bold text-lg">{log.details.fromLocationLabel || 'N/A'}</div>
+                                <div className="text-gray-300 text-xs">-{log.details.quantity || 0} unidades</div>
+                              </div>
+                              <div className="bg-gray-600 p-3 rounded-lg">
+                                <div className="text-green-400 text-xs">Hacia:</div>
+                                <div className="text-white font-bold text-lg">{log.details.toLocationLabel || 'N/A'}</div>
+                                <div className="text-gray-300 text-xs">+{log.details.quantity || 0} unidades</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Stock Anterior:</span>
+                            <div className="grid grid-cols-2 gap-4 text-xs">
+                              <div>
+                                <span className="text-gray-400">Bodega:</span>
+                                <div className="text-gray-300">{log.details.previousStock?.warehouse || 0} unidades</div>
+                              </div>
+                              <div>
+                                <span className="text-gray-400">Local:</span>
+                                <div className="text-gray-300">{log.details.previousStock?.store || 0} unidades</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Stock Después:</span>
+                            <div className="grid grid-cols-2 gap-4 text-xs">
+                              <div>
+                                <span className="text-gray-400">Bodega:</span>
+                                <div className="text-white font-medium">{log.details.newStock?.warehouse || 0} unidades</div>
+                              </div>
+                              <div>
+                                <span className="text-gray-400">Local:</span>
+                                <div className="text-white font-medium">{log.details.newStock?.store || 0} unidades</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'stock_adjustment' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Ajuste de stock:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2 font-medium text-orange-400 mb-3">
+                            <Package className="h-4 w-4" />
+                            <span>Ajuste de Stock</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-gray-300 text-xs">Producto:</span>
+                              <div className="text-white font-medium">{log.details.productName || 'N/A'}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Referencia:</span>
+                              <div className="text-white font-mono text-sm">{log.details.productReference || 'N/A'}</div>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Detalles del Ajuste:</span>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="bg-gray-600 p-3 rounded-lg">
+                                <div className="text-gray-400 text-xs">Ubicación:</div>
+                                <div className="text-white font-bold text-lg">{log.details.locationLabel || 'N/A'}</div>
+                              </div>
+                              <div className="bg-gray-600 p-3 rounded-lg">
+                                <div className="text-gray-400 text-xs">Tipo de Ajuste:</div>
+                                <div className={`font-bold text-lg ${
+                                  log.details.actionType === 'incremento' ? 'text-green-400' : 'text-red-400'
+                                }`}>
+                                  {log.details.actionType === 'incremento' ? 'Incremento' : 'Reducción'}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Cantidades:</span>
+                            <div className="grid grid-cols-2 gap-4 text-xs">
+                              <div>
+                                <span className="text-gray-400">Anterior:</span>
+                                <div className="text-gray-300">{log.details.previousQuantity || 0} unidades</div>
+                              </div>
+                              <div>
+                                <span className="text-gray-400">Nueva:</span>
+                                <div className="text-white font-medium">{log.details.newQuantity || 0} unidades</div>
+                              </div>
+                            </div>
+                            <div className="mt-2">
+                              <span className="text-gray-400">Diferencia:</span>
+                              <div className={`font-bold ${
+                                (log.details.difference || 0) > 0 ? 'text-green-400' : 'text-red-400'
+                              }`}>
+                                {(log.details.difference || 0) > 0 ? '+' : ''}{log.details.difference || 0} unidades
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="border-t border-gray-600 pt-3">
+                            <span className="text-gray-300 text-xs block mb-2">Razón del Ajuste:</span>
+                            <div className="text-white bg-gray-600 p-3 rounded-lg">
+                              {log.details.reason || 'No especificada'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Información específica para categorías */}
+                  {log.action === 'category_create' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Categoría creada:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2 font-medium text-indigo-400 mb-3">
+                            <Tag className="h-4 w-4" />
+                            <span>Nueva Categoría</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-gray-300 text-xs">Nombre:</span>
+                              <div className="text-white font-medium">{log.details.categoryName || 'N/A'}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Estado:</span>
+                              <div className={`font-medium ${log.details.status === 'active' ? 'text-green-400' : 'text-red-400'}`}>
+                                {log.details.status === 'active' ? 'Activa' : 'Inactiva'}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {log.details.description && (
+                            <div className="border-t border-gray-600 pt-3">
+                              <span className="text-gray-300 text-xs block mb-2">Descripción:</span>
+                              <div className="text-white bg-gray-600 p-3 rounded-lg">
+                                {log.details.description}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'category_update' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Categoría actualizada:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2 font-medium text-purple-400 mb-3">
+                            <Tag className="h-4 w-4" />
+                            <span>Categoría Actualizada</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-gray-300 text-xs">Nombre:</span>
+                              <div className="text-white font-medium">{log.details.categoryName || 'N/A'}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-300 text-xs">Estado:</span>
+                              <div className={`font-medium ${log.details.status === 'active' ? 'text-green-400' : 'text-red-400'}`}>
+                                {log.details.status === 'active' ? 'Activa' : 'Inactiva'}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {log.details.changes && (
+                            <div className="border-t border-gray-600 pt-3">
+                              <span className="text-gray-300 text-xs block mb-2">Cambios realizados:</span>
+                              <div className="text-white bg-gray-600 p-3 rounded-lg">
+                                {log.details.changes}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'category_delete' && log.details && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Categoría eliminada:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2 font-medium text-red-400 mb-3">
+                            <Tag className="h-4 w-4" />
+                            <span>Categoría Eliminada</span>
+                          </div>
+                          
+                          <div>
+                            <span className="text-gray-300 text-xs">Nombre:</span>
+                            <div className="text-white font-medium">{log.details.categoryName || 'N/A'}</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}

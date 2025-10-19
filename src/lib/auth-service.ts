@@ -379,7 +379,7 @@ export class AuthService {
     details: any
   ): Promise<void> {
     try {
-      await supabaseAdmin
+      const { data, error } = await supabaseAdmin
         .from('logs')
         .insert({
           user_id: userId,
@@ -390,6 +390,11 @@ export class AuthService {
           user_agent: null, // Se puede obtener del request
           created_at: new Date().toISOString()
         })
+        .select()
+        
+      if (error) {
+        console.error('Error insertando log en Supabase:', error)
+      }
     } catch (error) {
       console.error('Error registrando actividad:', error)
     }

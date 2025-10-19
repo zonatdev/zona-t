@@ -53,7 +53,9 @@ export function StockTransferModal({ isOpen, onClose, onTransfer, product }: Sto
   }
 
   const handleInputChange = (field: string, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    // Para el campo quantity, si es string vacío, lo convertimos a 0
+    const processedValue = field === 'quantity' && value === '' ? 0 : value
+    setFormData(prev => ({ ...prev, [field]: processedValue }))
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }))
     }
@@ -239,12 +241,12 @@ export function StockTransferModal({ isOpen, onClose, onTransfer, product }: Sto
                       type="number"
                       min="1"
                       max={getAvailableStock()}
-                      value={formData.quantity}
+                      value={formData.quantity || ''}
                       onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
                       className={`flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-white bg-gray-800 placeholder-gray-400 ${
                         errors.quantity ? 'border-red-500' : 'border-gray-600'
                       }`}
-                      placeholder="0"
+                      placeholder="Ingrese cantidad"
                     />
                     <div className="text-sm text-gray-400">
                       Máx: {getAvailableStock()}

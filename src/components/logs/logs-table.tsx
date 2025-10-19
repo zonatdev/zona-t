@@ -55,9 +55,19 @@ export function LogsTable({
         return ShoppingCart
       case 'product_create':
         return Plus
+      case 'product_update':
+        return Edit
       case 'product_edit':
         return Edit
       case 'product_delete':
+        return Trash2
+      case 'adjustment':
+        return Package
+      case 'category_create':
+        return Tag
+      case 'category_update':
+        return Edit
+      case 'category_delete':
         return Trash2
       case 'client_create':
         return Users
@@ -88,9 +98,19 @@ export function LogsTable({
         return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
       case 'product_create':
         return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400'
+      case 'product_update':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
       case 'product_edit':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
       case 'product_delete':
+        return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+      case 'adjustment':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
+      case 'category_create':
+        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400'
+      case 'category_update':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+      case 'category_delete':
         return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
       case 'client_create':
         return 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
@@ -121,10 +141,20 @@ export function LogsTable({
         return 'Venta'
       case 'product_create':
         return 'Producto Creado'
+      case 'product_update':
+        return 'Producto Actualizado'
       case 'product_edit':
         return 'Producto Editado'
       case 'product_delete':
         return 'Producto Eliminado'
+      case 'adjustment':
+        return 'Ajuste de Stock'
+      case 'category_create':
+        return 'Categoría Creada'
+      case 'category_update':
+        return 'Categoría Actualizada'
+      case 'category_delete':
+        return 'Categoría Eliminada'
       case 'client_create':
         return 'Cliente Creado'
       case 'client_edit':
@@ -289,10 +319,18 @@ export function LogsTable({
                     return 'roles'
                   }
                   if (log.module === 'products') {
-                    if (log.action.includes('Creado')) return 'product_create'
-                    if (log.action.includes('Editado')) return 'product_edit'
-                    if (log.action.includes('Eliminado')) return 'product_delete'
+                    if (log.action === 'product_create') return 'product_create'
+                    if (log.action === 'product_update') return 'product_update'
+                    if (log.action === 'product_delete') return 'product_delete'
+                    if (log.action === 'stock_transfer') return 'transfer'
+                    if (log.action === 'stock_adjustment') return 'adjustment'
                     return 'product_create'
+                  }
+                  if (log.module === 'categories') {
+                    if (log.action === 'category_create') return 'category_create'
+                    if (log.action === 'category_update') return 'category_update'
+                    if (log.action === 'category_delete') return 'category_delete'
+                    return 'category_create'
                   }
                   if (log.module === 'clients') {
                     if (log.action.includes('Creado')) return 'client_create'
@@ -347,7 +385,20 @@ export function LogsTable({
                     </td>
                     <td className="py-3 px-4 w-40">
                       <div className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                        {log.module === 'auth' ? 'Acceso al Sistema' : log.action}
+                        {log.module === 'auth' ? 'Acceso al Sistema' : 
+                         log.module === 'products' ? 
+                           (log.action === 'product_create' ? 'Crear Producto' :
+                            log.action === 'product_update' ? 'Actualizar Producto' :
+                            log.action === 'product_delete' ? 'Eliminar Producto' :
+                            log.action === 'stock_transfer' ? 'Transferir Stock' :
+                            log.action === 'stock_adjustment' ? 'Ajustar Stock' :
+                            log.action) :
+                         log.module === 'categories' ?
+                           (log.action === 'category_create' ? 'Crear Categoría' :
+                            log.action === 'category_update' ? 'Actualizar Categoría' :
+                            log.action === 'category_delete' ? 'Eliminar Categoría' :
+                            log.action) :
+                         log.action}
                       </div>
                     </td>
                     <td className="py-3 px-4 w-80">
@@ -359,6 +410,13 @@ export function LogsTable({
                              log.action === 'Usuario Eliminado' ? `Usuario eliminado: ${log.details.deletedUser?.name || 'Usuario'} - Email: ${log.details.deletedUser?.email || 'Desconocido'}` :
                              log.action === 'Permisos Asignados' ? `${log.details.description || 'Permisos asignados'}` :
                              log.action) :
+                            log.module === 'products' ?
+                              (log.details.description || log.action) :
+                            log.module === 'categories' ?
+                              (log.action === 'category_create' ? `Nueva categoría: "${log.details.categoryName || 'Categoría'}" - Estado: ${log.details.status || 'Activa'}` :
+                               log.action === 'category_update' ? `Categoría actualizada: "${log.details.categoryName || 'Categoría'}" - Cambios: ${log.details.changes || 'Estado modificado'}` :
+                               log.action === 'category_delete' ? `Categoría eliminada: "${log.details.categoryName || 'Categoría'}"` :
+                               log.details.description || log.action) :
                             log.module === 'auth' ? 
                               `Ingresó al sistema` :
                             log.action) :

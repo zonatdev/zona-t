@@ -18,6 +18,12 @@ import {
   Tag
 } from 'lucide-react'
 import { Product, Category } from '@/types'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface ProductTableProps {
   products: Product[]
@@ -94,6 +100,61 @@ export function ProductTable({
     }
   }
 
+  // Nueva lógica para estados de stock más precisos
+  const getStockStatusLabel = (product: Product) => {
+    const { warehouse, store, total } = product.stock
+    
+    if (total === 0) {
+      return 'Sin Stock'
+    }
+    
+    if (store > 0) {
+      if (store >= 10) {
+        return 'Disponible Local'
+      } else if (store >= 5) {
+        return 'Stock Local Bajo'
+      } else {
+        return 'Stock Local Muy Bajo'
+      }
+    }
+    
+    if (warehouse > 0) {
+      if (warehouse >= 20) {
+        return 'Solo Bodega'
+      } else if (warehouse >= 10) {
+        return 'Solo Bodega (Bajo)'
+      } else {
+        return 'Solo Bodega (Muy Bajo)'
+      }
+    }
+    
+    return 'Sin Stock'
+  }
+
+  const getStockStatusColor = (product: Product) => {
+    const { warehouse, store, total } = product.stock
+    
+    if (total === 0) {
+      return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+    }
+    
+    if (store > 0) {
+      if (store >= 10) {
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+      } else if (store >= 5) {
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+      } else {
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
+      }
+    }
+    
+    if (warehouse > 0) {
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+    }
+    
+    return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -113,16 +174,18 @@ export function ProductTable({
   })
 
   const categoryOptions = ['all', ...categories.map(c => c.id)]
-  const statuses = ['all', 'active', 'inactive', 'discontinued', 'out_of_stock']
+  const statuses = [
+    { value: 'all', label: 'Todos los estados' },
+    { value: 'active', label: 'Activo' },
+    { value: 'inactive', label: 'Inactivo' },
+    { value: 'discontinued', label: 'Descontinuado' },
+    { value: 'out_of_stock', label: 'Sin Stock' }
+  ]
 
   return (
     <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center text-gray-900 dark:text-white">
-            <Package className="h-5 w-5 mr-2 text-emerald-600" />
-            Gestión de Productos
-          </CardTitle>
+        <div className="flex items-center justify-end">
                   <div className="flex items-center space-x-2">
                     <Button onClick={onCreate} className="bg-emerald-700 hover:bg-emerald-800">
                       <Plus className="h-4 w-4 mr-2" />
@@ -169,8 +232,8 @@ export function ProductTable({
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700"
           >
             {statuses.map(status => (
-              <option key={status} value={status}>
-                {status === 'all' ? 'Todos los estados' : getStatusLabel(status)}
+              <option key={status.value} value={status.value}>
+                {status.label}
               </option>
             ))}
           </select>
@@ -187,7 +250,8 @@ export function ProductTable({
                         <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Bodega</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Local</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Total</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Estado</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Estado Stock</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Estado Producto</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">Acciones</th>
               </tr>
             </thead>
@@ -234,59 +298,107 @@ export function ProductTable({
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <Badge className={
-                        product.stock.total === 0 
-                          ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' 
-                          : product.stock.total <= 5 
-                          ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400' 
-                          : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                      }>
-                        {product.stock.total === 0 
-                          ? 'Sin Stock' 
-                          : product.stock.total <= 5 
-                          ? 'Stock Bajo' 
-                          : 'En Stock'
-                        }
+                      <Badge className={getStockStatusColor(product)}>
+                        {getStockStatusLabel(product)}
+                      </Badge>
+                    </td>
+                    <td className="py-4 px-4">
+                      <Badge className={getStatusColor(product.status)}>
+                        <div className="flex items-center space-x-1">
+                          <StatusIcon className="h-3 w-3" />
+                          <span>{getStatusLabel(product.status)}</span>
+                        </div>
                       </Badge>
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex items-center space-x-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => onEdit(product)}
-                          className="h-8 w-8 p-0 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/20"
-                          title="Editar producto"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => onStockAdjustment && onStockAdjustment(product)}
-                          className="h-8 w-8 p-0 text-orange-500 hover:text-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/20"
-                          title="Ajustar stock"
-                        >
-                          <Package className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => onStockTransfer && onStockTransfer(product)}
-                          className="h-8 w-8 p-0 text-purple-500 hover:text-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/20"
-                          title="Transferir stock"
-                        >
-                          <ArrowRightLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => onDelete(product)}
-                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20"
-                          title="Eliminar producto"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => onEdit(product)}
+                                className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20 dark:text-emerald-400 dark:hover:text-emerald-300 dark:hover:bg-emerald-900/20"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="text-center">
+                                <p className="font-medium">Editar Producto</p>
+                                <p className="text-xs text-gray-400">Modificar datos del producto</p>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        {onStockAdjustment && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => onStockAdjustment(product)}
+                                  className="h-8 w-8 p-0 text-orange-400 hover:text-orange-300 hover:bg-orange-900/20 dark:text-orange-400 dark:hover:text-orange-300 dark:hover:bg-orange-900/20"
+                                >
+                                  <Package className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="text-center">
+                                  <p className="font-medium">Ajustar Stock</p>
+                                  <p className="text-xs text-gray-400">Modificar cantidad de inventario</p>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+
+                        {onStockTransfer && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => onStockTransfer(product)}
+                                  className="h-8 w-8 p-0 text-purple-400 hover:text-purple-300 hover:bg-purple-900/20 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/20"
+                                >
+                                  <ArrowRightLeft className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div className="text-center">
+                                  <p className="font-medium">Transferir Stock</p>
+                                  <p className="text-xs text-gray-400">Mover entre Bodega y Local</p>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => onDelete(product)}
+                                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="text-center">
+                                <p className="font-medium">Eliminar Producto</p>
+                                <p className="text-xs text-gray-400">Borrar producto permanentemente</p>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </td>
                   </tr>

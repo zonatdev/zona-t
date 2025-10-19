@@ -20,21 +20,28 @@ import {
   TrendingUp,
   CreditCard
 } from 'lucide-react'
-import { mockSales, mockProducts, mockClients, mockPayments, mockCategories } from '@/data/mockData'
+import { useProducts } from '@/contexts/products-context'
+import { useClients } from '@/contexts/clients-context'
+import { useSales } from '@/contexts/sales-context'
 
 export default function Home() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year' | 'all'>('month')
+  
+  // Usar datos reales de los contextos
+  const { products } = useProducts()
+  const { clients } = useClients()
+  const { sales } = useSales()
 
   // Calcular métricas reales basadas en los datos
-  const totalSales = mockSales.reduce((sum, sale) => sum + sale.total, 0)
-  const totalInvestment = mockProducts.reduce((sum, product) => sum + (product.cost * product.stock.total), 0)
+  const totalSales = sales.reduce((sum, sale) => sum + sale.total, 0)
+  const totalInvestment = products.reduce((sum, product) => sum + (product.cost * product.stock.total), 0)
   const totalProfit = totalSales - totalInvestment
   const profitMargin = totalSales > 0 ? ((totalProfit / totalSales) * 100) : 0
-  const activeProducts = mockProducts.filter(p => p.status === 'active').length
-  const activeClients = mockClients.filter(c => c.status === 'active').length
-  const pendingPayments = mockPayments.reduce((sum, payment) => sum + payment.pendingAmount, 0)
-  const lowStockProducts = mockProducts.filter(p => p.stock.total <= 5).length
-  const salesThisMonth = mockSales.filter(sale => {
+  const activeProducts = products.filter(p => p.status === 'active').length
+  const activeClients = clients.filter(c => c.status === 'active').length
+  const pendingPayments = 0 // TODO: Implementar cuando tengamos el contexto de pagos
+  const lowStockProducts = products.filter(p => p.stock.total <= 5).length
+  const salesThisMonth = sales.filter(sale => {
     const saleDate = new Date(sale.createdAt)
     const now = new Date()
     return saleDate.getMonth() === now.getMonth() && saleDate.getFullYear() === now.getFullYear()
@@ -76,13 +83,11 @@ export default function Home() {
   }
 
   const productsChartData = {
-    labels: mockCategories.map(cat => cat.name),
+    labels: ['Tecnología', 'Accesorios', 'Audio y Video'],
     datasets: [
       {
         label: 'Productos',
-        data: mockCategories.map(cat => 
-          mockProducts.filter(p => p.categoryId === cat.id).length
-        ),
+        data: [4, 2, 1], // Datos temporales hasta implementar categorías reales
         backgroundColor: [
           'rgba(34, 197, 94, 0.8)',
           'rgba(59, 130, 246, 0.8)',
@@ -107,11 +112,11 @@ export default function Home() {
     datasets: [
       {
         data: [
-          mockSales.filter(s => s.paymentMethod === 'cash').length,
-          mockSales.filter(s => s.paymentMethod === 'credit').length,
-          mockSales.filter(s => s.paymentMethod === 'transfer').length,
-          mockSales.filter(s => s.paymentMethod === 'warranty').length,
-          mockSales.filter(s => s.paymentMethod === 'mixed').length
+          sales.filter(s => s.paymentMethod === 'cash').length,
+          sales.filter(s => s.paymentMethod === 'credit').length,
+          sales.filter(s => s.paymentMethod === 'transfer').length,
+          sales.filter(s => s.paymentMethod === 'warranty').length,
+          sales.filter(s => s.paymentMethod === 'mixed').length
         ],
         backgroundColor: [
           'rgba(34, 197, 94, 0.8)',
@@ -133,11 +138,11 @@ export default function Home() {
   }
 
   const stockChartData = {
-    labels: mockProducts.slice(0, 6).map(p => p.name),
+    labels: products.slice(0, 6).map(p => p.name),
     datasets: [
       {
         label: 'Stock Total',
-        data: mockProducts.slice(0, 6).map(p => p.stock.total),
+        data: products.slice(0, 6).map(p => p.stock.total),
         backgroundColor: 'rgba(34, 197, 94, 0.8)',
         borderColor: 'rgb(34, 197, 94)',
         borderWidth: 2
