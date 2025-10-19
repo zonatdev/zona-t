@@ -1,9 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { X, ArrowRightLeft, ShoppingCart, Package, Users, Tag, Calendar, User, Clock } from 'lucide-react'
+import { X, ArrowRightLeft, ShoppingCart, Package, Users, Tag, UserCheck, FileText } from 'lucide-react'
 import { LogEntry } from '@/types/logs'
 
 interface LogDetailModalProps {
@@ -97,34 +96,32 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
   }
 
   const formatDateTime = (timestamp: string) => {
-    const date = new Date(timestamp)
-    return date.toLocaleString('es-CO', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    })
+    try {
+      const date = new Date(timestamp)
+      return date.toLocaleString('es-CO', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch {
+      return 'Fecha inválida'
+    }
   }
 
   const TypeIcon = getTypeIcon(log.type)
 
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-gray-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <div className="flex items-center space-x-3">
-            <TypeIcon className="h-6 w-6 text-emerald-400" />
-            <div>
-              <h2 className="text-xl font-semibold text-white">
-                Detalles del Registro
-              </h2>
-              <p className="text-sm text-gray-300">
-                ID: {log.id}
-              </p>
-            </div>
+            <FileText className="h-5 w-5 text-emerald-400" />
+            <h2 className="text-lg font-semibold text-white">
+              Detalles del Registro
+            </h2>
           </div>
           <Button
             onClick={onClose}
@@ -132,127 +129,177 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
             size="sm"
             className="h-8 w-8 p-0 hover:bg-gray-700"
           >
-            <X className="h-5 w-5 text-gray-300 hover:text-white" />
+            <X className="h-4 w-4 text-gray-300 hover:text-white" />
           </Button>
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1">
-          <div className="space-y-6">
-            {/* Información General */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-lg text-white flex items-center">
-                  <Package className="h-5 w-5 mr-2 text-emerald-400" />
-                  Información General
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Tipo de Operación
-                    </label>
-                    <Badge className={getTypeColor(log.type)}>
-                      <TypeIcon className="h-3 w-3 mr-1" />
-                      {getTypeLabel(log.type)}
-                    </Badge>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Acción
-                    </label>
-                    <div className="text-white font-medium">{log.action}</div>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Descripción
-                  </label>
-                  <div className="text-white bg-gray-700 p-3 rounded-lg">
-                    {log.description}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Usuario
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <span className="text-white">{log.userName}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Fecha y Hora
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-gray-400" />
-                      <span className="text-white">{formatDateTime(log.timestamp)}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Detalles Específicos */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-lg text-white flex items-center">
-                  <Calendar className="h-5 w-5 mr-2 text-emerald-400" />
-                  Detalles de la Operación
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <pre className="text-sm text-gray-300 whitespace-pre-wrap overflow-x-auto">
-                    {JSON.stringify(log.details, null, 2)}
-                  </pre>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Información Adicional */}
-            {(log.ipAddress || log.userAgent) && (
-              <Card className="bg-gray-800 border-gray-700">
-                <CardHeader>
-                  <CardTitle className="text-lg text-white flex items-center">
-                    <User className="h-5 w-5 mr-2 text-emerald-400" />
-                    Información Adicional
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {log.ipAddress && (
+        <div className="p-4 overflow-y-auto flex-1">
+          <div className="space-y-4">
+            {/* Información Principal */}
+            <div className="bg-gray-800 rounded-lg p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">Acción:</span>
+                <Badge className={getTypeColor(log.type)}>
+                  <TypeIcon className="h-3 w-3 mr-1" />
+                  {log.action}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">Realizado por:</span>
+                <span className="text-white font-medium">{log.user_name || 'Desconocido'}</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">Fecha:</span>
+                <span className="text-white">{formatDateTime(log.created_at)}</span>
+              </div>
+              
+              {/* Información específica según el tipo de acción */}
+              {log.details && (
+                <div className="pt-2 border-t border-gray-700">
+                  {log.action === 'Permisos Asignados' && log.details.description && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Dirección IP
-                      </label>
-                      <div className="text-white font-mono bg-gray-700 px-3 py-2 rounded">
-                        {log.ipAddress}
+                      <span className="text-sm text-gray-400 block mb-2">Resumen de permisos:</span>
+                      <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
+                        <div className="space-y-2">
+                          {(() => {
+                            const desc = log.details.description
+                            // Extraer el nombre del usuario
+                            const userMatch = desc.match(/^([^-]+) -/)
+                            const userName = userMatch ? userMatch[1].trim() : 'Usuario'
+                            
+                            // Extraer cambios específicos
+                            const changesMatch = desc.match(/Módulos: (.+?)\. Resumen:/)
+                            const changes = changesMatch ? changesMatch[1].trim() : ''
+                            
+                            // Extraer resumen de permisos
+                            const summaryMatch = desc.match(/Resumen: (.+)$/)
+                            const summary = summaryMatch ? summaryMatch[1].trim() : ''
+                            
+                            return (
+                              <>
+                                <div className="flex items-center space-x-2 font-medium text-emerald-400 mb-3">
+                                  <UserCheck className="h-4 w-4" />
+                                  <span>{userName}</span>
+                                </div>
+                                
+                                {changes && (
+                                  <div className="mb-3">
+                                    <div className="text-gray-300 text-xs mb-1">Cambios realizados:</div>
+                                    <div className="text-yellow-300 text-xs bg-gray-600 p-2 rounded">
+                                      {changes
+                                        .replace(/Agregados:/g, 'Agregados:')
+                                        .replace(/Removidos:/g, 'Removidos:')
+                                        .replace(/products:/g, 'Productos:')
+                                        .replace(/clients:/g, 'Clientes:')
+                                        .replace(/sales:/g, 'Ventas:')
+                                        .replace(/payments:/g, 'Abonos:')
+                                        .replace(/roles:/g, 'Roles:')
+                                        .replace(/dashboard:/g, 'Dashboard:')
+                                        .replace(/logs:/g, 'Logs:')
+                                        .replace(/view/g, 'Ver')
+                                        .replace(/create/g, 'Crear')
+                                        .replace(/edit/g, 'Editar')
+                                        .replace(/delete/g, 'Eliminar')
+                                        .replace(/cancel/g, 'Cancelar')
+                                      }
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {summary && (
+                                  <div>
+                                    <div className="text-gray-300 text-xs mb-2">Permisos actuales:</div>
+                                    <div className="space-y-1">
+                                      {summary.split(' | ').map((module, index) => (
+                                        <div key={index} className="flex items-center space-x-2">
+                                          <div className="w-2 h-2 bg-emerald-400 rounded-full flex-shrink-0"></div>
+                                          <span className="text-xs">
+                                            {module
+                                              .replace(/Productos:/g, 'Productos:')
+                                              .replace(/Clientes:/g, 'Clientes:')
+                                              .replace(/Ventas:/g, 'Ventas:')
+                                              .replace(/Abonos:/g, 'Abonos:')
+                                              .replace(/Roles:/g, 'Roles:')
+                                              .replace(/Dashboard:/g, 'Dashboard:')
+                                              .replace(/Logs:/g, 'Logs:')
+                                              .replace(/Ver/g, 'Ver')
+                                              .replace(/Crear/g, 'Crear')
+                                              .replace(/Editar/g, 'Editar')
+                                              .replace(/Eliminar/g, 'Eliminar')
+                                              .replace(/Cancelar/g, 'Cancelar')
+                                            }
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            )
+                          })()}
+                        </div>
                       </div>
                     </div>
                   )}
-                  {log.userAgent && (
+                  
+                  {log.action === 'Usuario Creado' && log.details.newUser && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        User Agent
-                      </label>
-                      <div className="text-white text-sm bg-gray-700 p-3 rounded">
-                        {log.userAgent}
+                      <span className="text-sm text-gray-400 block mb-2">Nuevo usuario:</span>
+                      <div className="text-white text-sm">
+                        <strong>{log.details.newUser.name}</strong> - {log.details.newUser.email} ({log.details.newUser.role})
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            )}
+                  
+                  {log.action === 'Usuario Editado' && log.details.userName && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Usuario editado:</span>
+                      <div className="text-white text-sm">
+                        <strong>{log.details.userName}</strong>
+                        {log.details.changes && Object.keys(log.details.changes).length > 0 && (
+                          <span className="text-gray-400 ml-2">
+                            - Campos modificados: {Object.keys(log.details.changes).join(', ')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'Usuario Eliminado' && log.details.deletedUser && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Usuario eliminado:</span>
+                      <div className="text-white text-sm">
+                        <strong>{log.details.deletedUser.name}</strong> - {log.details.deletedUser.email}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {log.action === 'Rol Cambiado' && log.details.userName && (
+                    <div>
+                      <span className="text-sm text-gray-400 block mb-2">Cambio de rol:</span>
+                      <div className="text-white text-sm">
+                        <strong>{log.details.userName}</strong>
+                        {log.details.changes?.role && (
+                          <span className="text-gray-400 ml-2">
+                            - Nuevo rol: {log.details.changes.role}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end space-x-4 p-6 border-t border-gray-700 bg-gray-800">
+        <div className="flex justify-end p-4 border-t border-gray-700">
           <Button
             onClick={onClose}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6"
           >
             Cerrar
           </Button>

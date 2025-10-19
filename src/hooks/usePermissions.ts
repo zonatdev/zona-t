@@ -1,37 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { User, Permission } from '@/types'
-
-// Mock current user - en una app real esto vendría de un contexto de autenticación
-const mockCurrentUser: User = {
-  id: '1',
-  name: 'Diego Admin',
-  email: 'admin@zonat.com',
-  password: 'admin123',
-  role: 'superadmin',
-  permissions: [
-    { module: 'dashboard', actions: ['view'] },
-    { module: 'products', actions: ['view', 'create', 'edit', 'delete'] },
-    { module: 'clients', actions: ['view', 'create', 'edit', 'delete'] },
-    { module: 'sales', actions: ['view', 'create', 'edit', 'delete', 'cancel'] },
-    { module: 'payments', actions: ['view', 'create', 'edit', 'delete'] },
-    { module: 'roles', actions: ['view', 'create', 'edit', 'delete'] },
-    { module: 'logs', actions: ['view'] }
-  ],
-  isActive: true,
-  lastLogin: '2024-01-20T10:30:00Z',
-  createdAt: '2024-01-01',
-  updatedAt: '2024-01-20T10:30:00Z'
-}
+import { useAuth } from '@/contexts/auth-context'
 
 export function usePermissions() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    // En una app real, esto vendría de un contexto de autenticación
-    setCurrentUser(mockCurrentUser)
-  }, [])
+  const { user: currentUser } = useAuth()
 
   const hasPermission = (module: string, action: string): boolean => {
     if (!currentUser) return false

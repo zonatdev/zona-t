@@ -5,10 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
-  Activity,
   Search,
   Filter,
-  Download,
   Eye,
   ArrowRightLeft,
   ShoppingCart,
@@ -17,19 +15,37 @@ import {
   Tag,
   Trash2,
   Edit,
-  Plus
+  Plus,
+  RefreshCw
 } from 'lucide-react'
 import { LogEntry } from '@/types/logs'
 
 interface LogsTableProps {
   logs: LogEntry[]
   onViewDetails: (log: LogEntry) => void
+  searchTerm?: string
+  onSearchChange?: (term: string) => void
+  moduleFilter?: string
+  onModuleFilterChange?: (module: string) => void
+  actionFilter?: string
+  onActionFilterChange?: (action: string) => void
+  onRefresh?: () => void
 }
 
-export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState('all')
-  const [filterAction, setFilterAction] = useState('all')
+export function LogsTable({ 
+  logs, 
+  onViewDetails, 
+  searchTerm = '', 
+  onSearchChange,
+  moduleFilter = 'all',
+  onModuleFilterChange,
+  actionFilter = 'all',
+  onActionFilterChange,
+  onRefresh
+}: LogsTableProps) {
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm)
+  const [localFilterType, setLocalFilterType] = useState(moduleFilter)
+  const [localFilterAction, setLocalFilterAction] = useState(actionFilter)
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -38,19 +54,29 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
       case 'sale':
         return ShoppingCart
       case 'product_create':
+        return Plus
       case 'product_edit':
+        return Edit
       case 'product_delete':
-        return Package
+        return Trash2
       case 'client_create':
-      case 'client_edit':
-      case 'client_delete':
         return Users
+      case 'client_edit':
+        return Edit
+      case 'client_delete':
+        return Trash2
       case 'category_create':
-      case 'category_edit':
-      case 'category_delete':
         return Tag
-      default:
-        return Activity
+      case 'category_edit':
+        return Edit
+      case 'category_delete':
+        return Trash2
+      case 'roles':
+        return Users
+      case 'login':
+        return Users
+       default:
+         return Users
     }
   }
 
@@ -78,6 +104,10 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
         return 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400'
       case 'category_delete':
         return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+      case 'roles':
+        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400'
+      case 'login':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
     }
@@ -86,7 +116,7 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'transfer':
-        return 'Transferencia'
+        return 'Transferencia de Stock'
       case 'sale':
         return 'Venta'
       case 'product_create':
@@ -107,8 +137,12 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
         return 'Categoría Editada'
       case 'category_delete':
         return 'Categoría Eliminada'
+      case 'roles':
+        return 'Gestión de Usuarios'
+      case 'login':
+        return 'Inicio de Sesión'
       default:
-        return type
+        return type || 'Actividad'
     }
   }
 
@@ -124,37 +158,35 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
   }
 
   const filteredLogs = logs.filter(log => {
-    const matchesSearch = searchTerm === '' ||
-      log.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.userName.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = (onSearchChange ? searchTerm : localSearchTerm) === '' ||
+      log.description?.toLowerCase().includes((onSearchChange ? searchTerm : localSearchTerm).toLowerCase()) ||
+      log.action.toLowerCase().includes((onSearchChange ? searchTerm : localSearchTerm).toLowerCase()) ||
+      log.user_name?.toLowerCase().includes((onSearchChange ? searchTerm : localSearchTerm).toLowerCase())
 
-    const matchesType = filterType === 'all' || log.type === filterType
-    const matchesAction = filterAction === 'all' || log.action === filterAction
+    const matchesType = (onModuleFilterChange ? moduleFilter : localFilterType) === 'all' || log.module === (onModuleFilterChange ? moduleFilter : localFilterType)
+    const matchesAction = (onActionFilterChange ? actionFilter : localFilterAction) === 'all' || log.action === (onActionFilterChange ? actionFilter : localFilterAction)
 
     return matchesSearch && matchesType && matchesAction
   })
 
-  const types = ['all', 'transfer', 'sale', 'product_create', 'product_edit', 'product_delete', 'client_create', 'client_edit', 'client_delete', 'category_create', 'category_edit', 'category_delete']
-  const actions = ['all', 'Transferencia de Stock', 'Nueva Venta', 'Venta Cancelada', 'Producto Creado', 'Producto Editado', 'Producto Eliminado', 'Cliente Creado', 'Cliente Editado', 'Cliente Eliminado', 'Categoría Creada', 'Categoría Editada', 'Categoría Eliminada']
+  const types = ['all', 'transfer', 'sale', 'product_create', 'product_edit', 'product_delete', 'client_create', 'client_edit', 'client_delete', 'category_create', 'category_edit', 'category_delete', 'roles', 'login']
+  const actions = [
+    'all', 
+    'Transferencia de Stock', 'Nueva Venta', 'Venta Cancelada', 
+    'Producto Creado', 'Producto Editado', 'Producto Eliminado', 
+    'Cliente Creado', 'Cliente Editado', 'Cliente Eliminado', 
+    'Categoría Creada', 'Categoría Editada', 'Categoría Eliminada', 
+    'Usuario Creado', 'Usuario Editado', 'Usuario Eliminado', 
+    'Permisos Asignados', 'Permisos Revocados', 'Rol Cambiado', 
+    'Usuario Desactivado', 'Usuario Reactivado', 'Acceso al Sistema'
+  ]
 
   return (
     <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center text-gray-900 dark:text-white">
-            <Activity className="h-5 w-5 mr-2 text-emerald-600" />
-            Registro de Actividades
           </CardTitle>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Exportar
-            </Button>
-          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -165,14 +197,28 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
             <input
               type="text"
               placeholder="Buscar en registros..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={onSearchChange ? searchTerm : localSearchTerm}
+              onChange={(e) => {
+                const value = e.target.value
+                if (onSearchChange) {
+                  onSearchChange(value)
+                } else {
+                  setLocalSearchTerm(value)
+                }
+              }}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-600 dark:placeholder-gray-400 bg-white dark:bg-gray-700"
             />
           </div>
           <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
+            value={onModuleFilterChange ? moduleFilter : localFilterType}
+            onChange={(e) => {
+              const value = e.target.value
+              if (onModuleFilterChange) {
+                onModuleFilterChange(value)
+              } else {
+                setLocalFilterType(value)
+              }
+            }}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700"
           >
             <option value="all">Todos los tipos</option>
@@ -183,8 +229,15 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
             ))}
           </select>
           <select
-            value={filterAction}
-            onChange={(e) => setFilterAction(e.target.value)}
+            value={onActionFilterChange ? actionFilter : localFilterAction}
+            onChange={(e) => {
+              const value = e.target.value
+              if (onActionFilterChange) {
+                onActionFilterChange(value)
+              } else {
+                setLocalFilterAction(value)
+              }
+            }}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700"
           >
             <option value="all">Todas las acciones</option>
@@ -194,6 +247,16 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
               </option>
             ))}
           </select>
+          {onRefresh && (
+            <Button
+              onClick={onRefresh}
+              variant="outline"
+              className="px-4 py-2"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Actualizar
+            </Button>
+          )}
         </div>
 
         {/* Table */}
@@ -212,38 +275,106 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
             </thead>
             <tbody>
               {filteredLogs.map((log, index) => {
-                const TypeIcon = getTypeIcon(log.type)
+                // Mapear el tipo basado en el módulo y acción
+                const getLogType = (log: any) => {
+                  if (log.module === 'roles') {
+                    if (log.action === 'Usuario Creado') return 'client_create'
+                    if (log.action === 'Usuario Editado') return 'client_edit'
+                    if (log.action === 'Usuario Eliminado') return 'client_delete'
+                    if (log.action === 'Permisos Asignados') return 'client_edit'
+                    if (log.action === 'Permisos Revocados') return 'client_edit'
+                    if (log.action === 'Rol Cambiado') return 'client_edit'
+                    if (log.action === 'Usuario Desactivado') return 'client_edit'
+                    if (log.action === 'Usuario Reactivado') return 'client_edit'
+                    return 'roles'
+                  }
+                  if (log.module === 'products') {
+                    if (log.action.includes('Creado')) return 'product_create'
+                    if (log.action.includes('Editado')) return 'product_edit'
+                    if (log.action.includes('Eliminado')) return 'product_delete'
+                    return 'product_create'
+                  }
+                  if (log.module === 'clients') {
+                    if (log.action.includes('Creado')) return 'client_create'
+                    if (log.action.includes('Editado')) return 'client_edit'
+                    if (log.action.includes('Eliminado')) return 'client_delete'
+                    return 'client_create'
+                  }
+                  if (log.module === 'sales') {
+                    if (log.action.includes('Venta')) return 'sale'
+                    return 'sale'
+                  }
+                  if (log.module === 'payments') {
+                    if (log.action.includes('Transferencia')) return 'transfer'
+                    return 'transfer'
+                  }
+                  if (log.module === 'auth') {
+                    return 'login' // Tipo específico para login
+                  }
+                  return 'roles' // Default
+                }
+                
+                const logType = getLogType(log)
+                const TypeIcon = getTypeIcon(logType)
                 return (
                   <tr key={log.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="py-4 px-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {index + 1}
+                        {filteredLogs.length - index}
                       </div>
                     </td>
-                    <td className="py-4 px-4">
-                      <Badge className={getTypeColor(log.type)}>
-                        <TypeIcon className="h-3 w-3 mr-1" />
-                        {getTypeLabel(log.type)}
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {log.action}
+                    <td className="py-3 px-4">
+                      <div className="flex items-center space-x-3">
+                        <div className={`p-2 rounded-lg ${getTypeColor(logType)} flex-shrink-0`}>
+                          <TypeIcon className="h-4 w-4" />
+                        </div>
+                        <div className="flex flex-col justify-center min-h-[40px]">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white leading-tight">
+                            {getTypeLabel(logType)}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+                            {log.module === 'roles' ? 'Gestión de Usuarios' : 
+                             log.module === 'products' ? 'Productos' :
+                             log.module === 'clients' ? 'Clientes' :
+                             log.module === 'sales' ? 'Ventas' :
+                             log.module === 'payments' ? 'Abonos' :
+                             log.module === 'logs' ? 'Logs' :
+                             log.module === 'auth' ? 'Inicio de Sesión' :
+                             log.module || 'Sistema'}
+                          </span>
+                        </div>
                       </div>
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="text-sm text-gray-600 dark:text-gray-300 max-w-md truncate" title={log.description}>
-                        {log.description}
+                    <td className="py-3 px-4 w-40">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                        {log.module === 'auth' ? 'Acceso al Sistema' : log.action}
                       </div>
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="text-sm text-gray-900 dark:text-white">
-                        {log.userName}
+                    <td className="py-3 px-4 w-80">
+                      <div className="text-sm text-gray-600 dark:text-gray-300 max-w-xs truncate" title={log.details ? JSON.stringify(log.details) : log.action}>
+                        {log.details ? 
+                          (log.module === 'roles' ? 
+                            (log.action === 'Usuario Creado' ? `Nuevo usuario: ${log.details.newUser?.name || 'Usuario'} - Rol: ${log.details.newUser?.role || 'Desconocido'}` :
+                             log.action === 'Usuario Editado' ? `Actualización: ${log.details.userName || 'Usuario'} - Cambios: ${Object.keys(log.details.changes || {}).join(', ')}` :
+                             log.action === 'Usuario Eliminado' ? `Usuario eliminado: ${log.details.deletedUser?.name || 'Usuario'} - Email: ${log.details.deletedUser?.email || 'Desconocido'}` :
+                             log.action === 'Permisos Asignados' ? `${log.details.description || 'Permisos asignados'}` :
+                             log.action) :
+                            log.module === 'auth' ? 
+                              `Ingresó al sistema` :
+                            log.action) :
+                          log.module === 'auth' ? 
+                            `Ingresó al sistema` :
+                          log.action}
                       </div>
                     </td>
-                    <td className="py-4 px-4">
-                      <div className="text-sm text-gray-600 dark:text-gray-300">
-                        {formatDateTime(log.timestamp)}
+                    <td className="py-3 px-4 w-32">
+                      <div className="text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                        {log.user_name || 'Usuario Desconocido'}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 w-32">
+                      <div className="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                        {formatDateTime(log.created_at)}
                       </div>
                     </td>
                     <td className="py-4 px-4">
@@ -268,7 +399,7 @@ export function LogsTable({ logs, onViewDetails }: LogsTableProps) {
 
         {filteredLogs.length === 0 && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <Activity className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <Users className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <p>No se encontraron registros</p>
           </div>
         )}

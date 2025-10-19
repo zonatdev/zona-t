@@ -150,32 +150,32 @@ export function SaleDetailModal({
 
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-600">
           <div className="flex items-center space-x-3">
-            <Receipt className="h-6 w-6 text-emerald-600" />
+            <Receipt className="h-6 w-6 text-emerald-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Detalle de Venta</h2>
-              <p className="text-sm text-gray-600">{generateInvoiceNumber(sale.id)}</p>
+              <h2 className="text-xl font-semibold text-white">Detalle de Venta</h2>
+              <p className="text-sm text-gray-400">{generateInvoiceNumber(sale.id)}</p>
             </div>
           </div>
           <Button
             onClick={onClose}
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 hover:bg-gray-100"
+            className="h-8 w-8 p-0 hover:bg-gray-700 text-gray-400 hover:text-white"
           >
-            <X className="h-5 w-5 text-gray-600 hover:text-gray-900" />
+            <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-6 overflow-y-auto flex-1 bg-gray-800">
           {/* Sale Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <Card>
+            <Card className="bg-gray-700 border-gray-600">
               <CardHeader>
-                <CardTitle className="text-lg text-gray-900">Información de la Venta</CardTitle>
+                <CardTitle className="text-lg text-white">Información de la Venta</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-3">

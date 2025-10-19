@@ -201,36 +201,36 @@ export function SaleModal({ isOpen, onClose, onSave }: SaleModalProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-800 dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col border border-gray-700">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-600">
           <div className="flex items-center space-x-3">
-            <Calculator className="h-6 w-6 text-emerald-600" />
+            <Calculator className="h-6 w-6 text-emerald-500" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Nueva Venta</h2>
-              <p className="text-sm text-gray-600">Venta #{saleNumber}</p>
+              <h2 className="text-xl font-semibold text-white">Nueva Venta</h2>
+              <p className="text-sm text-gray-400">Venta #{saleNumber}</p>
             </div>
           </div>
           <Button
             onClick={handleClose}
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 hover:bg-gray-100"
+            className="h-8 w-8 p-0 hover:bg-gray-700 text-gray-400 hover:text-white"
           >
-            <X className="h-5 w-5 text-gray-600 hover:text-gray-900" />
+            <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-6 overflow-y-auto flex-1 bg-gray-800">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Client and Products */}
             <div className="space-y-6">
               {/* Client Selection */}
-              <Card>
+              <Card className="bg-gray-700 border-gray-600">
                 <CardHeader>
-                  <CardTitle className="flex items-center text-lg text-gray-900">
-                    <User className="h-5 w-5 mr-2 text-emerald-600" />
+                  <CardTitle className="flex items-center text-lg text-white">
+                    <User className="h-5 w-5 mr-2 text-emerald-500" />
                     Cliente
                   </CardTitle>
                 </CardHeader>
@@ -246,11 +246,11 @@ export function SaleModal({ isOpen, onClose, onSave }: SaleModalProps) {
                         setShowClientDropdown(true)
                       }}
                       onFocus={() => setShowClientDropdown(true)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder-gray-600 text-gray-900"
+                      className="w-full pl-10 pr-4 py-2 border-2 border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder-gray-400 text-white bg-gray-600"
                     />
                     
                     {showClientDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-gray-700 border border-gray-600 rounded-xl shadow-xl max-h-48 overflow-y-auto">
                         {filteredClients.map(client => (
                           <button
                             key={client.id}
@@ -259,11 +259,11 @@ export function SaleModal({ isOpen, onClose, onSave }: SaleModalProps) {
                               setClientSearch(client.name)
                               setShowClientDropdown(false)
                             }}
-                            className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center justify-between"
+                            className="w-full px-4 py-2 text-left hover:bg-gray-600 flex items-center justify-between rounded-lg transition-colors"
                           >
                             <div>
-                              <div className="font-semibold text-gray-900">{client.name}</div>
-                              <div className="text-sm text-gray-600">{client.type}</div>
+                              <div className="font-semibold text-white">{client.name}</div>
+                              <div className="text-sm text-gray-400">{client.type}</div>
                             </div>
                             <Badge className={`${getClientTypeColor(client.type)} font-medium`}>
                               {client.type === 'mayorista' ? 'Mayorista' : 
@@ -276,11 +276,11 @@ export function SaleModal({ isOpen, onClose, onSave }: SaleModalProps) {
                   </div>
 
                   {selectedClient && (
-                    <div className="mt-3 p-3 bg-emerald-50 rounded-md">
+                    <div className="mt-3 p-3 bg-emerald-900/20 rounded-xl border border-emerald-500/30">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-bold text-emerald-900">{selectedClient.name}</div>
-                          <div className="text-sm text-emerald-800 font-semibold">{selectedClient.email}</div>
+                          <div className="font-bold text-emerald-300">{selectedClient.name}</div>
+                          <div className="text-sm text-emerald-400 font-semibold">{selectedClient.email}</div>
                         </div>
                         <Badge className={`${getClientTypeColor(selectedClient.type)} font-semibold`}>
                           {selectedClient.type === 'mayorista' ? 'Mayorista' : 
@@ -293,10 +293,10 @@ export function SaleModal({ isOpen, onClose, onSave }: SaleModalProps) {
               </Card>
 
               {/* Product Selection */}
-              <Card>
+              <Card className="bg-gray-700 border-gray-600">
                 <CardHeader>
-                  <CardTitle className="flex items-center text-lg text-gray-900">
-                    <Package className="h-5 w-5 mr-2 text-emerald-600" />
+                  <CardTitle className="flex items-center text-lg text-white">
+                    <Package className="h-5 w-5 mr-2 text-emerald-500" />
                     Productos
                   </CardTitle>
                 </CardHeader>
@@ -312,24 +312,24 @@ export function SaleModal({ isOpen, onClose, onSave }: SaleModalProps) {
                         setShowProductDropdown(true)
                       }}
                       onFocus={() => setShowProductDropdown(true)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder-gray-600 text-gray-900"
+                      className="w-full pl-10 pr-4 py-2 border-2 border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder-gray-400 text-white bg-gray-600"
                     />
                     
                     {showProductDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-gray-700 border border-gray-600 rounded-xl shadow-xl max-h-48 overflow-y-auto">
                         {filteredProducts.map(product => (
                           <button
                             key={product.id}
                             onClick={() => handleAddProduct(product)}
-                            className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center justify-between"
+                            className="w-full px-4 py-2 text-left hover:bg-gray-600 flex items-center justify-between rounded-lg transition-colors"
                           >
                             <div>
-                              <div className="font-semibold text-gray-900">{product.name}</div>
-                              <div className="text-sm text-gray-600 font-medium">{product.brand} - {product.categoryId}</div>
+                              <div className="font-semibold text-white">{product.name}</div>
+                              <div className="text-sm text-gray-400 font-medium">{product.brand} - {product.categoryId}</div>
                             </div>
                             <div className="text-right">
-                              <div className="font-semibold text-gray-900">${product.price.toLocaleString()}</div>
-                              <div className="text-sm text-gray-600 font-medium">Stock: {product.stock.total}</div>
+                              <div className="font-semibold text-white">${product.price.toLocaleString()}</div>
+                              <div className="text-sm text-gray-400 font-medium">Stock: {product.stock.total}</div>
                             </div>
                           </button>
                         ))}

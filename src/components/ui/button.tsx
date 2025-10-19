@@ -14,20 +14,20 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+        "inline-flex items-center justify-center rounded-xl text-base font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none shadow-lg hover:shadow-xl transform hover:-translate-y-0.5",
         {
-          "bg-emerald-700 text-white hover:bg-emerald-800": variant === 'default',
-          "bg-red-600 text-white hover:bg-red-700": variant === 'destructive',
-          "border border-gray-300 bg-white hover:bg-gray-50": variant === 'outline',
-          "bg-gray-100 text-gray-900 hover:bg-gray-200": variant === 'secondary',
-          "hover:bg-gray-100": variant === 'ghost',
-          "underline-offset-4 hover:underline": variant === 'link',
+          "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700": variant === 'default',
+          "bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700": variant === 'destructive',
+          "border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700": variant === 'outline',
+          "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600": variant === 'secondary',
+          "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white": variant === 'ghost',
+          "underline-offset-4 hover:underline text-emerald-600 dark:text-emerald-400": variant === 'link',
         },
         {
-          "h-10 py-2 px-4": size === 'default',
-          "h-9 px-3 rounded-md": size === 'sm',
-          "h-11 px-8 rounded-md": size === 'lg',
-          "h-10 w-10": size === 'icon',
+          "h-12 py-3 px-6": size === 'default',
+          "h-10 px-4 rounded-lg": size === 'sm',
+          "h-14 px-8 rounded-xl": size === 'lg',
+          "h-12 w-12 rounded-xl": size === 'icon',
         },
         className
       )}
