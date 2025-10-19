@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/contexts/auth-context";
-import { ProtectedRoute } from "@/components/auth/protected-route";
-import { ConditionalLayout } from "@/components/layout/conditional-layout";
+import "../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZONA T - Panel de Control",
+  title: "ZONA T - Iniciar Sesión",
   description: "Sistema de gestión de inventario y ventas para ZONA T",
   icons: {
     icon: '/zonat-logo.webp',
@@ -26,7 +22,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -36,13 +32,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <AuthProvider>
-            <ConditionalLayout>
-              {children}
-            </ConditionalLayout>
-          </AuthProvider>
-        </ThemeProvider>
+        <div className="min-h-screen">
+          {children}
+        </div>
       </body>
     </html>
   );
