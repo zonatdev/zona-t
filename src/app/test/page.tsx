@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function TestPage() {
   return (
     <div className="p-8">
@@ -17,11 +19,11 @@ export default function TestPage() {
         <div className="bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
           <h3 className="font-semibold text-blue-800 dark:text-blue-200">🔗 Páginas Disponibles:</h3>
           <ul className="mt-2 space-y-1 text-blue-700 dark:text-blue-300">
-            <li>• <a href="/" className="underline hover:no-underline">Dashboard Principal</a></li>
-            <li>• <a href="/login" className="underline hover:no-underline">Página de Login</a></li>
-            <li>• <a href="/products" className="underline hover:no-underline">Gestión de Productos</a></li>
-            <li>• <a href="/clients" className="underline hover:no-underline">Gestión de Clientes</a></li>
-            <li>• <a href="/sales" className="underline hover:no-underline">Gestión de Ventas</a></li>
+            <li>• <Link href="/" className="underline hover:no-underline">Dashboard Principal</Link></li>
+            <li>• <Link href="/login" className="underline hover:no-underline">Página de Login</Link></li>
+            <li>• <Link href="/products" className="underline hover:no-underline">Gestión de Productos</Link></li>
+            <li>• <Link href="/clients" className="underline hover:no-underline">Gestión de Clientes</Link></li>
+            <li>• <Link href="/sales" className="underline hover:no-underline">Gestión de Ventas</Link></li>
           </ul>
         </div>
         

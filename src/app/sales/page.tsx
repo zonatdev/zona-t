@@ -66,20 +66,20 @@ export default function SalesPage() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6 bg-gray-900 min-h-screen flex items-center justify-center">
+      <div className="p-6 space-y-6 bg-white dark:bg-gray-900 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-gray-300">Cargando ventas...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 dark:border-emerald-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Cargando ventas...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-6 space-y-6 bg-gray-900 min-h-screen">
-      <div>
-        <h1 className="text-3xl font-bold text-white">Gestión de Ventas</h1>
-        <p className="text-gray-300 mt-2">
+    <div className="p-6 space-y-6 bg-white dark:bg-gray-900 min-h-screen">
+      <div className="xl:ml-0 ml-20">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Ventas</h1>
+        <p className="text-gray-600 dark:text-gray-300 mt-2">
           Administra tus ventas y genera facturas
         </p>
       </div>

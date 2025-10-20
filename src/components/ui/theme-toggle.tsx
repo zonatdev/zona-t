@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Sun, Moon, Monitor } from 'lucide-react'
+import { Sun, Moon, Settings } from 'lucide-react'
 import { useTheme } from '@/components/theme-provider'
 
 export function ThemeToggle() {
@@ -10,9 +10,9 @@ export function ThemeToggle() {
   const [isOpen, setIsOpen] = useState(false)
 
   const themes = [
-    { value: 'light', label: 'Claro', icon: Sun },
-    { value: 'dark', label: 'Oscuro', icon: Moon },
-    { value: 'system', label: 'Sistema', icon: Monitor }
+    { value: 'light', label: 'Modo Claro', icon: Sun },
+    { value: 'dark', label: 'Modo Oscuro', icon: Moon },
+    { value: 'system', label: 'Automático', icon: Settings }
   ] as const
 
   const currentTheme = themes.find(t => t.value === theme) || themes[2]
@@ -24,9 +24,10 @@ export function ThemeToggle() {
         onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
         size="sm"
-        className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+        className="w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white hover:shadow-sm"
       >
-        <CurrentIcon className="h-4 w-4" />
+        <CurrentIcon className="h-5 w-5 mr-3" />
+        {currentTheme.label}
       </Button>
 
       {isOpen && (
@@ -38,7 +39,7 @@ export function ThemeToggle() {
           />
           
           {/* Dropdown */}
-          <div className="absolute right-0 top-10 z-20 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
+          <div className="absolute left-0 top-12 z-20 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
             {themes.map((themeOption) => {
               const Icon = themeOption.icon
               return (
@@ -50,7 +51,7 @@ export function ThemeToggle() {
                   }}
                   className={`w-full flex items-center px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                     theme === themeOption.value
-                      ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20'
+                      ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
                       : 'text-gray-700 dark:text-gray-300'
                   }`}
                 >

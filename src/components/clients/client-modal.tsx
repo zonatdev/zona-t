@@ -465,7 +465,7 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-blue-600 hover:bg-blue-700"
           >
             {isEdit ? 'Actualizar Cliente' : 'Crear Cliente'}
           </Button>

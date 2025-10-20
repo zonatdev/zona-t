@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/ui/sidebar'
 import { ProtectedRoute } from '@/components/auth/protected-route'
+import { useState, useEffect } from 'react'
 
 interface ConditionalLayoutProps {
   children: React.ReactNode
@@ -10,6 +11,7 @@ interface ConditionalLayoutProps {
 
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   
   // Si es la página de login, no mostrar sidebar ni protección
   if (pathname === '/login') {
@@ -20,9 +22,11 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   return (
     <ProtectedRoute>
       <div className="flex h-screen bg-white dark:bg-gray-900">
-        <Sidebar />
-        <main className="flex-1 lg:ml-56">
-          <div className="h-full overflow-auto">
+        <Sidebar onMobileMenuToggle={setIsMobileMenuOpen} />
+        <main className={`flex-1 xl:ml-64 relative z-10 bg-white dark:bg-gray-900 transition-all duration-300 ${
+          isMobileMenuOpen ? 'blur-sm' : ''
+        }`}>
+          <div className="h-full overflow-auto bg-white dark:bg-gray-900">
             {children}
           </div>
         </main>

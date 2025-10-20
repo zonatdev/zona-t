@@ -69,7 +69,7 @@ export default function LogsPage() {
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <div>
+      <div className="xl:ml-0 ml-20">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Registro de Actividades</h1>
         <p className="text-gray-600 dark:text-gray-300 mt-2">
           Historial completo de todas las operaciones del sistema
@@ -77,8 +77,8 @@ export default function LogsPage() {
       </div>
 
       <LogsTable
-        logs={filteredLogs}
-        onViewDetails={handleViewDetails}
+        logs={filteredLogs as any}
+        onViewDetails={handleViewDetails as any}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         moduleFilter={moduleFilter}
@@ -91,7 +91,7 @@ export default function LogsPage() {
       <LogDetailModal
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetail}
-        log={selectedLog}
+        log={selectedLog as any}
       />
     </div>
   )

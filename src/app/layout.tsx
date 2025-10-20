@@ -9,6 +9,7 @@ import { CategoriesProvider } from "@/contexts/categories-context";
 import { SalesProvider } from "@/contexts/sales-context";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
+import { GlobalLoading } from "@/components/ui/global-loading";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -47,6 +48,7 @@ export default function RootLayout({
               <ProductsProvider>
                 <CategoriesProvider>
                   <SalesProvider>
+                    <GlobalLoading />
                     <ConditionalLayout>
                       {children}
                     </ConditionalLayout>

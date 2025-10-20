@@ -187,7 +187,7 @@ export function ProductTable({
       <CardHeader>
         <div className="flex items-center justify-end">
                   <div className="flex items-center space-x-2">
-                    <Button onClick={onCreate} className="bg-emerald-700 hover:bg-emerald-800">
+                    <Button onClick={onCreate} className="bg-gray-700 hover:bg-gray-800">
                       <Plus className="h-4 w-4 mr-2" />
                       Nuevo Producto
                     </Button>
@@ -259,7 +259,7 @@ export function ProductTable({
               {filteredProducts.map((product, index) => {
                 const StatusIcon = getStatusIcon(product.status)
                 return (
-                  <tr key={product.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <tr key={product.id} className="border-b border-gray-100 dark:border-gray-700">
                     <td className="py-4 px-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {index + 1}
@@ -319,7 +319,7 @@ export function ProductTable({
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => onEdit(product)}
-                                className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20 dark:text-emerald-400 dark:hover:text-emerald-300 dark:hover:bg-emerald-900/20"
+                                className="h-8 w-8 p-0 text-gray-400 dark:text-gray-400"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -341,7 +341,7 @@ export function ProductTable({
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => onStockAdjustment(product)}
-                                  className="h-8 w-8 p-0 text-orange-400 hover:text-orange-300 hover:bg-orange-900/20 dark:text-orange-400 dark:hover:text-orange-300 dark:hover:bg-orange-900/20"
+                                  className="h-8 w-8 p-0 text-orange-400 dark:text-orange-400"
                                 >
                                   <Package className="h-4 w-4" />
                                 </Button>
@@ -364,7 +364,7 @@ export function ProductTable({
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => onStockTransfer(product)}
-                                  className="h-8 w-8 p-0 text-purple-400 hover:text-purple-300 hover:bg-purple-900/20 dark:text-purple-400 dark:hover:text-purple-300 dark:hover:bg-purple-900/20"
+                                  className="h-8 w-8 p-0 text-purple-400 dark:text-purple-400"
                                 >
                                   <ArrowRightLeft className="h-4 w-4" />
                                 </Button>
@@ -386,7 +386,7 @@ export function ProductTable({
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => onDelete(product)}
-                                className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                                className="h-8 w-8 p-0 text-red-400 dark:text-red-400"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>

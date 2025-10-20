@@ -23,9 +23,19 @@ interface StatisticsCardsProps {
     lowStockProducts: number
     salesThisMonth: number
   }
+  previousStats?: {
+    totalSales: number
+    totalProfit: number
+    activeProducts: number
+    activeClients: number
+    pendingPayments: number
+    profitMargin: number
+    lowStockProducts: number
+    salesThisMonth: number
+  }
 }
 
-export function StatisticsCards({ stats }: StatisticsCardsProps) {
+export function StatisticsCards({ stats, previousStats }: StatisticsCardsProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -34,12 +44,43 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     }).format(amount)
   }
 
+  const calculateChange = (current: number, previous: number, isPercentage: boolean = false) => {
+    if (!previousStats || previous === 0) {
+      return { change: 'N/A', changeType: 'neutral' as const }
+    }
+    
+    const change = ((current - previous) / previous) * 100
+    const changeType = change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'
+    
+    if (isPercentage) {
+      return {
+        change: `${change > 0 ? '+' : ''}${change.toFixed(1)}%`,
+        changeType
+      }
+    } else {
+      const absoluteChange = current - previous
+      return {
+        change: `${absoluteChange > 0 ? '+' : ''}${absoluteChange}`,
+        changeType
+      }
+    }
+  }
+
+  const salesChange = calculateChange(stats.totalSales, previousStats?.totalSales || 0, true)
+  const profitChange = calculateChange(stats.totalProfit, previousStats?.totalProfit || 0, true)
+  const productsChange = calculateChange(stats.activeProducts, previousStats?.activeProducts || 0, false)
+  const clientsChange = calculateChange(stats.activeClients, previousStats?.activeClients || 0, false)
+  const marginChange = calculateChange(stats.profitMargin, previousStats?.profitMargin || 0, true)
+  const paymentsChange = calculateChange(stats.pendingPayments, previousStats?.pendingPayments || 0, false)
+  const stockChange = calculateChange(stats.lowStockProducts, previousStats?.lowStockProducts || 0, false)
+  const monthlySalesChange = calculateChange(stats.salesThisMonth, previousStats?.salesThisMonth || 0, false)
+
   const cards = [
     {
       title: 'Ventas Totales',
       value: formatCurrency(stats.totalSales),
-      change: '+12.5%',
-      changeType: 'positive' as const,
+      change: salesChange.change,
+      changeType: salesChange.changeType,
       icon: DollarSign,
       color: 'emerald',
       bgColor: 'bg-emerald-100 dark:bg-emerald-900/20',
@@ -48,8 +89,8 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     {
       title: 'Ganancia Total',
       value: formatCurrency(stats.totalProfit),
-      change: '+15.3%',
-      changeType: 'positive' as const,
+      change: profitChange.change,
+      changeType: profitChange.changeType,
       icon: TrendingUp,
       color: 'purple',
       bgColor: 'bg-purple-100 dark:bg-purple-900/20',
@@ -58,8 +99,8 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     {
       title: 'Productos Activos',
       value: stats.activeProducts.toString(),
-      change: '+3',
-      changeType: 'positive' as const,
+      change: productsChange.change,
+      changeType: productsChange.changeType,
       icon: Package,
       color: 'blue',
       bgColor: 'bg-blue-100 dark:bg-blue-900/20',
@@ -68,8 +109,8 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     {
       title: 'Clientes Activos',
       value: stats.activeClients.toString(),
-      change: '+5',
-      changeType: 'positive' as const,
+      change: clientsChange.change,
+      changeType: clientsChange.changeType,
       icon: Users,
       color: 'green',
       bgColor: 'bg-green-100 dark:bg-green-900/20',
@@ -78,8 +119,8 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     {
       title: 'Margen de Ganancia',
       value: `${stats.profitMargin}%`,
-      change: '+2.1%',
-      changeType: 'positive' as const,
+      change: marginChange.change,
+      changeType: marginChange.changeType,
       icon: Target,
       color: 'orange',
       bgColor: 'bg-orange-100 dark:bg-orange-900/20',
@@ -88,8 +129,8 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     {
       title: 'Pagos Pendientes',
       value: formatCurrency(stats.pendingPayments),
-      change: '-2',
-      changeType: 'negative' as const,
+      change: paymentsChange.change,
+      changeType: paymentsChange.changeType,
       icon: CreditCard,
       color: 'red',
       bgColor: 'bg-red-100 dark:bg-red-900/20',
@@ -98,8 +139,8 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     {
       title: 'Stock Bajo',
       value: stats.lowStockProducts.toString(),
-      change: 'Requiere atención',
-      changeType: 'warning' as const,
+      change: stats.lowStockProducts > 0 ? 'Requiere atención' : stockChange.change,
+      changeType: stats.lowStockProducts > 0 ? 'warning' as const : stockChange.changeType,
       icon: AlertTriangle,
       color: 'yellow',
       bgColor: 'bg-yellow-100 dark:bg-yellow-900/20',
@@ -108,8 +149,8 @@ export function StatisticsCards({ stats }: StatisticsCardsProps) {
     {
       title: 'Ventas Este Mes',
       value: stats.salesThisMonth.toString(),
-      change: 'Transacciones',
-      changeType: 'neutral' as const,
+      change: `${monthlySalesChange.change} transacciones`,
+      changeType: monthlySalesChange.changeType,
       icon: ShoppingCart,
       color: 'emerald',
       bgColor: 'bg-emerald-100 dark:bg-emerald-900/20',

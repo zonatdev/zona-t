@@ -424,9 +424,9 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                   Control de Stock
                 </CardTitle>
                 {product && (
-                  <p className="text-sm text-gray-400 mt-2">
-                    ℹ️ El stock se muestra solo como información. Para modificar el inventario, usa las opciones de "Ajustar Stock" o "Transferir Stock" desde la tabla de productos.
-                  </p>
+            <p className="text-sm text-gray-400 mt-2">
+              ℹ️ El stock se muestra solo como información. Para modificar el inventario, usa las opciones de &quot;Ajustar Stock&quot; o &quot;Transferir Stock&quot; desde la tabla de productos.
+            </p>
                 )}
               </CardHeader>
               <CardContent className="space-y-6">
@@ -601,7 +601,7 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 font-medium px-6 py-2 shadow-md"
+            className="bg-blue-600 hover:bg-blue-700 font-medium px-6 py-2 shadow-md"
           >
             {product ? 'Guardar Cambios' : 'Crear Producto'}
           </Button>

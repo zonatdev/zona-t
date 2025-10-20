@@ -78,7 +78,7 @@ export function SalesTable({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
       case 'cancelled':
@@ -145,14 +145,10 @@ export function SalesTable({
   })
 
   return (
-    <Card className="border-gray-700 bg-gray-800">
+    <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center text-white">
-            <Receipt className="h-5 w-5 mr-2 text-emerald-400" />
-            Gestión de Ventas
-          </CardTitle>
-          <Button onClick={onCreate} className="bg-emerald-600 hover:bg-emerald-700">
+        <div className="flex items-center justify-start">
+          <Button onClick={onCreate} className="bg-gray-600 hover:bg-gray-700">
             <Plus className="h-4 w-4 mr-2" />
             Nueva Venta
           </Button>
@@ -160,56 +156,58 @@ export function SalesTable({
       </CardHeader>
       <CardContent>
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
               placeholder="Buscar ventas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-600 bg-gray-700 text-white placeholder-gray-400 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-          >
-            {statuses.map(status => (
-              <option key={status} value={status} className="bg-gray-700 text-white">
-                {status === 'all' ? 'Todos los estados' : getStatusLabel(status)}
-              </option>
-            ))}
-          </select>
+          <div className="flex-1 max-w-sm">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+            >
+              {statuses.map(status => (
+                <option key={status} value={status} className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                  {status === 'all' ? 'Todos los estados' : getStatusLabel(status)}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-600">
-                <th className="text-left py-3 px-4 font-medium text-gray-300"># Factura</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-300">Cliente</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-300">Método de Pago</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-300">Total</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-300">Fecha</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-300">Estado</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-300">Acciones</th>
+              <tr className="border-b border-gray-200 dark:border-gray-600">
+                <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300"># Factura</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Cliente</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Método de Pago</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Total</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Fecha</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Estado</th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {filteredSales.map((sale) => {
                 const { date, time } = formatDateTime(sale.createdAt)
                 return (
-                  <tr key={sale.id} className="border-b border-gray-700 hover:bg-gray-700">
+                  <tr key={sale.id} className="border-b border-gray-200 dark:border-gray-700">
                     <td className="py-4 px-4">
-                      <div className="font-semibold text-blue-400">
+                      <div className="font-semibold text-blue-600 dark:text-blue-400">
                         {generateInvoiceNumber(sale)}
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-medium text-white">{sale.clientName}</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{sale.clientName}</div>
                     </td>
                     <td className="py-4 px-4">
                       <Badge className={getPaymentMethodColor(sale.paymentMethod)}>
@@ -217,14 +215,14 @@ export function SalesTable({
                       </Badge>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="font-semibold text-white">
+                      <div className="font-semibold text-gray-900 dark:text-white">
                         {formatCurrency(sale.total)}
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <div className="text-sm text-gray-300">
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
                         <div className="font-medium">{date}</div>
-                        <div className="text-gray-400">{time}</div>
+                        <div className="text-gray-500 dark:text-gray-400">{time}</div>
                       </div>
                     </td>
                     <td className="py-4 px-4">
@@ -238,7 +236,7 @@ export function SalesTable({
                           size="sm"
                           variant="ghost"
                           onClick={() => onView(sale)}
-                          className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                          className="flex items-center space-x-1 text-blue-400"
                         >
                           <Eye className="h-4 w-4" />
                           <span className="text-sm">Ver</span>
@@ -247,7 +245,7 @@ export function SalesTable({
                           size="sm"
                           variant="ghost"
                           onClick={() => onPrint(sale)}
-                          className="flex items-center space-x-1 text-orange-400 hover:text-orange-300 hover:bg-orange-900/20"
+                          className="flex items-center space-x-1 text-orange-400"
                         >
                           <Printer className="h-4 w-4" />
                           <span className="text-sm">Imprimir</span>

@@ -199,30 +199,30 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
                 <span className="text-sm text-gray-400">Acción:</span>
                 <Badge className={getTypeColor(log.type)}>
                   <TypeIcon className="h-3 w-3 mr-1" />
-                  {getActionLabel(log.action, log.module)}
+                  {getActionLabel(log.action, (log as any).module)}
                 </Badge>
               </div>
               
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Realizado por:</span>
-                <span className="text-white font-medium">{log.user_name || 'Desconocido'}</span>
+                <span className="text-white font-medium">{(log as any).user_name || 'Desconocido'}</span>
               </div>
               
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Fecha:</span>
-                <span className="text-white">{formatDateTime(log.created_at)}</span>
+                <span className="text-white">{formatDateTime((log as any).created_at)}</span>
               </div>
               
               {/* Información específica según el tipo de acción */}
               {log.details && (
                 <div className="pt-2 border-t border-gray-700">
-                  {log.action === 'Permisos Asignados' && log.details.description && (
+                  {log.action === 'Permisos Asignados' && (log.details as any).description && (
                     <div>
                       <span className="text-sm text-gray-400 block mb-2">Resumen de permisos:</span>
                       <div className="text-white text-sm bg-gray-700 p-4 rounded-lg">
                         <div className="space-y-2">
                           {(() => {
-                            const desc = log.details.description
+                            const desc = (log.details as any).description
                             // Extraer el nombre del usuario
                             const userMatch = desc.match(/^([^-]+) -/)
                             const userName = userMatch ? userMatch[1].trim() : 'Usuario'
@@ -270,7 +270,7 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
                                   <div>
                                     <div className="text-gray-300 text-xs mb-2">Permisos actuales:</div>
                                     <div className="space-y-1">
-                                      {summary.split(' | ').map((module, index) => (
+                                      {summary.split(' | ').map((module: any, index: number) => (
                                         <div key={index} className="flex items-center space-x-2">
                                           <div className="w-2 h-2 bg-emerald-400 rounded-full flex-shrink-0"></div>
                                           <span className="text-xs">
@@ -302,16 +302,16 @@ export function LogDetailModal({ isOpen, onClose, log }: LogDetailModalProps) {
                     </div>
                   )}
                   
-                  {log.action === 'Usuario Creado' && log.details.newUser && (
+                  {log.action === 'Usuario Creado' && (log.details as any).newUser && (
                     <div>
                       <span className="text-sm text-gray-400 block mb-2">Nuevo usuario:</span>
                       <div className="text-white text-sm">
-                        <strong>{log.details.newUser.name}</strong> - {log.details.newUser.email} ({log.details.newUser.role})
+                        <strong>{(log.details as any).newUser.name}</strong> - {(log.details as any).newUser.email} ({(log.details as any).newUser.role})
                       </div>
                     </div>
                   )}
                   
-                  {log.action === 'Usuario Editado' && log.details.userName && (
+                  {log.action === 'Usuario Editado' && (log.details as any).userName && (
                     <div>
                       <span className="text-sm text-gray-400 block mb-2">Usuario editado:</span>
                       <div className="text-white text-sm">

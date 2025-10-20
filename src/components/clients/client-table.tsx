@@ -98,7 +98,7 @@ export function ClientTable({
             <Users className="h-5 w-5 mr-2 text-emerald-600" />
             Gestión de Clientes
           </CardTitle>
-          <Button onClick={onCreate} className="bg-emerald-700 hover:bg-emerald-800">
+          <Button onClick={onCreate} className="bg-gray-700 hover:bg-gray-800">
             <Plus className="h-4 w-4 mr-2" />
             Nuevo Cliente
           </Button>
@@ -148,7 +148,7 @@ export function ClientTable({
               {filteredClients.map((client) => {
                 const TypeIcon = getTypeIcon(client.type)
                 return (
-                  <tr key={client.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <tr key={client.id} className="border-b border-gray-100 dark:border-gray-700">
                     <td className="py-4 px-4">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 mr-3">
@@ -164,7 +164,7 @@ export function ClientTable({
                     <td className="py-4 px-4 min-w-[120px]">
                       <div className="text-sm">
                         <div 
-                          className="font-mono text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis cursor-help hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded transition-colors" 
+                          className="font-mono text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis cursor-help px-2 py-1 rounded" 
                           title={`Cédula/NIT: ${client.document}`}
                         >
                           {client.document}
@@ -199,7 +199,7 @@ export function ClientTable({
                           size="sm"
                           variant="ghost"
                           onClick={() => onEdit(client)}
-                          className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20 dark:text-emerald-400 dark:hover:text-emerald-300 dark:hover:bg-emerald-900/20"
+                          className="h-8 w-8 p-0 text-gray-400 dark:text-gray-400"
                           title="Editar cliente"
                         >
                           <Edit className="h-4 w-4" />
@@ -208,7 +208,7 @@ export function ClientTable({
                           size="sm"
                           variant="ghost"
                           onClick={() => onDelete(client)}
-                          className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                          className="h-8 w-8 p-0 text-red-400 dark:text-red-400"
                           title="Eliminar cliente"
                         >
                           <Trash2 className="h-4 w-4" />
